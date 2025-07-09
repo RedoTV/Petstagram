@@ -16,20 +16,20 @@ public class PetService : IPetService
         _mapper = mapper;
     }
 
-    public async Task AddPetToUser(int userId, AddPetToUserDto petDto)
+    public async Task AddPetToUserAsync(int userId, AddPetToUserAsyncDto petDto)
     {
-        var pet = _mapper.Map<AddPetToUserDto, Pet>(petDto);
+        var pet = _mapper.Map<AddPetToUserAsyncDto, Pet>(petDto);
         pet.UserId = userId;
         await _petRepository.AddAsync(pet);
     }
 
-    public async Task<ICollection<PetResponse>> GetUserPets(int userId)
+    public async Task<ICollection<PetResponse>> GetUserPetsAsync(int userId)
     {
         var pets = await _petRepository.GetAsync(userId);
         return pets.Select(p => _mapper.Map<Pet, PetResponse>(p)).ToList();
     }
 
-    public async Task RemoveUserPet(int petId)
+    public async Task RemoveUserPetAsync(int petId)
     {
         await _petRepository.RemoveAsync(petId);
     }

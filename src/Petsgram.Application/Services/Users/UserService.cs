@@ -16,15 +16,15 @@ public class UserService : IUserService
         _mapper = mapper;
     }
 
-    public async Task<ICollection<UserResponse>> GetUsersWithPets(int count, int skip)
+    public async Task<ICollection<UserResponse>> GetUsersWithPetsAsync(int count, int skip)
     {
         var users = await _userRepository.GetUsersAsync(count, skip);
         return users.Select(u => _mapper.Map<User, UserResponse>(u)).ToList();
     }
 
-    public async Task<UserResponse> GetUserById(int userId)
+    public async Task<UserResponse> GetUserByIdAsync(int userId)
     {
-        var user = await _userRepository.GetUserByIdAsync(userId);
+        var user = await _userRepository.GetUserByIdAsyncAsync(userId);
         return _mapper.Map<User, UserResponse>(user);
     }
 }

@@ -16,7 +16,7 @@ public class UserRepository : IUserRepository
         throw new NotImplementedException();
     }
 
-    public Task<User> GetUserByIdAsync(int id)
+    public Task<User> GetUserByIdAsyncAsync(int id)
     {
         throw new NotImplementedException();
     }

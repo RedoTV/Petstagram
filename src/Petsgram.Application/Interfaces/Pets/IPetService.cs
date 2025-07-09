@@ -4,7 +4,7 @@ namespace Petsgram.Application.Interfaces.Pets;
 
 public interface IPetService
 {
-    Task<ICollection<PetResponse>> GetUserPets(int userId);
-    Task AddPetToUser(int userId, AddPetToUserDto pet);
-    Task RemoveUserPet(int petId);
+    Task<ICollection<PetResponse>> GetUserPetsAsync(int userId);
+    Task AddPetToUserAsync(int userId, AddPetToUserAsyncDto pet);
+    Task RemoveUserPetAsync(int petId);
 }

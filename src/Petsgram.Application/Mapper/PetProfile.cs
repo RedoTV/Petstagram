@@ -8,7 +8,7 @@ public class PetProfile : Profile
 {
     public PetProfile()
     {
-        CreateMap<AddPetToUserDto, Pet>()
+        CreateMap<AddPetToUserAsyncDto, Pet>()
             .ForMember(dest => dest.PetName, opt => opt.MapFrom(src => src.PetName))
             .ForMember(dest => dest.Photos, opt => opt.Ignore())
             .ForMember(dest => dest.PetTypeId, opt => opt.Ignore())

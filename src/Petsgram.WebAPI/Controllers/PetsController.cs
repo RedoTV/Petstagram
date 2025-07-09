@@ -22,7 +22,7 @@ public class PetsController : ControllerBase
     {
         try
         {
-            var pets = await _petService.GetUserPets(userId);
+            var pets = await _petService.GetUserPetsAsync(userId);
             return Ok(new { pets });
         }
         catch (Exception exc)
@@ -33,11 +33,11 @@ public class PetsController : ControllerBase
     }
 
     [HttpPost("addPet/{userId}")]
-    public async Task<IActionResult> AddPet(int userId, AddPetToUserDto pet)
+    public async Task<IActionResult> AddPet(int userId, AddPetToUserAsyncDto pet)
     {
         try
         {
-            await _petService.AddPetToUser(userId, pet);
+            await _petService.AddPetToUserAsync(userId, pet);
             return Ok(new { message = "Pet added" });
         }
         catch (Exception exc)
@@ -52,7 +52,7 @@ public class PetsController : ControllerBase
     {
         try
         {
-            await _petService.RemoveUserPet(petId);
+            await _petService.RemoveUserPetAsync(petId);
             return Ok(new { message = "Pet with id removed" });
         }
         catch (Exception exc)

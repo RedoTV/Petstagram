@@ -5,8 +5,8 @@ namespace Petsgram.Application.Interfaces.Users;
 
 public interface IUserRepository
 {
-    public Task<ICollection<User>> GetUsersAsync(int count, int skip);
-    public Task<User> GetUserByIdAsync(int id);
-    public Task<ICollection<Pet>> GetPetsByUserIdAsync(int userId);
-    public Task AddUserAsync(AddUserDto userRequest);
+    Task<ICollection<User>> GetUsersAsync(int count, int skip);
+    Task<User> GetUserByIdAsyncAsync(int id);
+    Task<ICollection<Pet>> GetPetsByUserIdAsync(int userId);
+    Task AddUserAsync(AddUserDto userRequest);
 }
