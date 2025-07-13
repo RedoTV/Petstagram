@@ -4,6 +4,6 @@ namespace Petsgram.Application.Interfaces.Users;
 
 public interface IUserService
 {
-    Task<ICollection<UserResponse>> GetUsersWithPetsAsync(int count, int skip);
-    Task<UserResponse> GetUserByIdAsync(int id);
+    // Task<IEnumerable<UserResponse>> GetAllAsync(int count, int skip);
+    // Task<UserResponse> FindAsync(int id);
 }

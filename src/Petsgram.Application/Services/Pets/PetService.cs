@@ -2,35 +2,19 @@ using Petsgram.Application.DTOs.Pets;
 using Petsgram.Application.Interfaces.Pets;
 using AutoMapper;
 using Petsgram.Domain.Entities;
+using Petsgram.Application.Interfaces.UnitOfWork;
 
 namespace Petsgram.Application.Services.Pets;
 
 public class PetService : IPetService
 {
-    private readonly IPetRepository _petRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public PetService(IPetRepository petRepository, IMapper mapper)
+    public PetService(IUnitOfWork unitOfWork, IMapper mapper)
     {
-        _petRepository = petRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
-    public async Task AddPetToUserAsync(int userId, AddPetToUserAsyncDto petDto)
-    {
-        var pet = _mapper.Map<AddPetToUserAsyncDto, Pet>(petDto);
-        pet.UserId = userId;
-        await _petRepository.AddAsync(pet);
-    }
-
-    public async Task<ICollection<PetResponse>> GetUserPetsAsync(int userId)
-    {
-        var pets = await _petRepository.GetAsync(userId);
-        return pets.Select(p => _mapper.Map<Pet, PetResponse>(p)).ToList();
-    }
-
-    public async Task RemoveUserPetAsync(int petId)
-    {
-        await _petRepository.RemoveAsync(petId);
-    }
 }

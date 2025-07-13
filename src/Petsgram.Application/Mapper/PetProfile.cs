@@ -8,11 +8,10 @@ public class PetProfile : Profile
 {
     public PetProfile()
     {
-        CreateMap<AddPetToUserAsyncDto, Pet>()
+        CreateMap<AddPetToUserDto, Pet>()
             .ForMember(dest => dest.PetName, opt => opt.MapFrom(src => src.PetName))
             .ForMember(dest => dest.Photos, opt => opt.Ignore())
             .ForMember(dest => dest.PetTypeId, opt => opt.Ignore())
-            .ForMember(dest => dest.PetType, opt => opt.Ignore())
             .ForMember(dest => dest.UserId, opt => opt.Ignore())
             .ForMember(dest => dest.User, opt => opt.Ignore())
             .AfterMap((src, dest) => dest.PetType = new PetType { Name = src.PetType });

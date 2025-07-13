@@ -17,48 +17,48 @@ public class PetsController : ControllerBase
         _petService = petService;
     }
 
-    [HttpGet("getPets/{userId}")]
-    public async Task<IActionResult> GetPets(int userId)
-    {
-        try
-        {
-            var pets = await _petService.GetUserPetsAsync(userId);
-            return Ok(new { pets });
-        }
-        catch (Exception exc)
-        {
-            _logger.LogInformation($"Pets not found for user with id:{userId}, \nerror:{exc}");
-            return BadRequest(new { message = "Pets not found" });
-        }
-    }
+    // [HttpGet("getPets/{userId}")]
+    // public async Task<IActionResult> GetPets(int userId)
+    // {
+    //     try
+    //     {
+    //         var pets = await _petService.GetUserPetsAsync(userId);
+    //         return Ok(new { pets });
+    //     }
+    //     catch (Exception exc)
+    //     {
+    //         _logger.LogInformation($"Pets not found for user with id:{userId}, \nerror:{exc}");
+    //         return BadRequest(new { message = "Pets not found" });
+    //     }
+    // }
 
-    [HttpPost("addPet/{userId}")]
-    public async Task<IActionResult> AddPet(int userId, AddPetToUserAsyncDto pet)
-    {
-        try
-        {
-            await _petService.AddPetToUserAsync(userId, pet);
-            return Ok(new { message = "Pet added" });
-        }
-        catch (Exception exc)
-        {
-            _logger.LogError($"Pet not added for user with id:{userId}, \nerror:{exc}");
-            return BadRequest(new { message = "Pet not added" });
-        }
-    }
+    // [HttpPost("addPet/{userId}")]
+    // public async Task<IActionResult> AddPet(int userId, AddPetToUserDto pet)
+    // {
+    //     try
+    //     {
+    //         await _petService.AddPetToUserAsync(userId, pet);
+    //         return Ok(new { message = "Pet added" });
+    //     }
+    //     catch (Exception exc)
+    //     {
+    //         _logger.LogError($"Pet not added for user with id:{userId}, \nerror:{exc}");
+    //         return BadRequest(new { message = "Pet not added" });
+    //     }
+    // }
 
-    [HttpDelete("removePet/{petId}")]
-    public async Task<IActionResult> RemovePet(int petId)
-    {
-        try
-        {
-            await _petService.RemoveUserPetAsync(petId);
-            return Ok(new { message = "Pet with id removed" });
-        }
-        catch (Exception exc)
-        {
-            _logger.LogError($"Pet not removed \nerror:{exc}");
-            return BadRequest(new { message = "Pet not removed" });
-        }
-    }
+    // [HttpDelete("removePet/{petId}")]
+    // public async Task<IActionResult> RemovePet(int petId)
+    // {
+    //     try
+    //     {
+    //         await _petService.RemoveUserPetAsync(petId);
+    //         return Ok(new { message = "Pet with id removed" });
+    //     }
+    //     catch (Exception exc)
+    //     {
+    //         _logger.LogError($"Pet not removed \nerror:{exc}");
+    //         return BadRequest(new { message = "Pet not removed" });
+    //     }
+    // }
 }

@@ -1,6 +1,7 @@
 using Petsgram.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Petsgram.Infrastructure.EntityConfigurations;
+using System.Reflection;
 
 namespace Petsgram.Infrastructure.DbContexts;
 
@@ -13,6 +14,6 @@ public class PetsgramDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfiguration(new PetConfiguration());
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }
