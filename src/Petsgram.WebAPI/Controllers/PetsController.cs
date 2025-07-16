@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Petsgram.WebApi.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class PetsController : ControllerBase
 {
     private readonly ILogger<PetsController> _logger;
@@ -17,48 +17,83 @@ public class PetsController : ControllerBase
         _petService = petService;
     }
 
-    // [HttpGet("getPets/{userId}")]
-    // public async Task<IActionResult> GetPets(int userId)
-    // {
-    //     try
-    //     {
-    //         var pets = await _petService.GetUserPetsAsync(userId);
-    //         return Ok(new { pets });
-    //     }
-    //     catch (Exception exc)
-    //     {
-    //         _logger.LogInformation($"Pets not found for user with id:{userId}, \nerror:{exc}");
-    //         return BadRequest(new { message = "Pets not found" });
-    //     }
-    // }
+    [HttpGet("by-user/{userId}")]
+    public async Task<IActionResult> GetAllByUser(int userId)
+    {
+        try
+        {
+            var pets = await _petService.GetUserPetsAsync(userId);
+            _logger.LogInformation($"Returned {pets.Count()} pets for user {userId}");
+            return Ok(pets);
+        }
+        catch (Exception exc)
+        {
+            _logger.LogError($"Error getting pets for user {userId}: {exc}");
+            return BadRequest(new { message = "Error getting pets" });
+        }
+    }
 
-    // [HttpPost("addPet/{userId}")]
-    // public async Task<IActionResult> AddPet(int userId, AddPetToUserDto pet)
-    // {
-    //     try
-    //     {
-    //         await _petService.AddPetToUserAsync(userId, pet);
-    //         return Ok(new { message = "Pet added" });
-    //     }
-    //     catch (Exception exc)
-    //     {
-    //         _logger.LogError($"Pet not added for user with id:{userId}, \nerror:{exc}");
-    //         return BadRequest(new { message = "Pet not added" });
-    //     }
-    // }
+    [HttpGet("{petId}")]
+    public async Task<IActionResult> GetById(int petId)
+    {
+        try
+        {
+            var pet = await _petService.GetPetByIdAsync(petId);
+            _logger.LogInformation($"Returned pet with id:{petId}");
+            return Ok(pet);
+        }
+        catch (Exception exc)
+        {
+            _logger.LogError($"Pet not found with id:{petId}, error:{exc}");
+            return BadRequest(new { message = "Pet not found" });
+        }
+    }
 
-    // [HttpDelete("removePet/{petId}")]
-    // public async Task<IActionResult> RemovePet(int petId)
-    // {
-    //     try
-    //     {
-    //         await _petService.RemoveUserPetAsync(petId);
-    //         return Ok(new { message = "Pet with id removed" });
-    //     }
-    //     catch (Exception exc)
-    //     {
-    //         _logger.LogError($"Pet not removed \nerror:{exc}");
-    //         return BadRequest(new { message = "Pet not removed" });
-    //     }
-    // }
+    [HttpPost]
+    public async Task<IActionResult> Create(int userId, [FromBody] CreatePetDto dto)
+    {
+        try
+        {
+            await _petService.AddPetToUserAsync(userId, dto);
+            _logger.LogInformation($"Pet created for user {userId}");
+            return Ok();
+        }
+        catch (Exception exc)
+        {
+            _logger.LogError($"Pet not created for user {userId}, error:{exc}");
+            return BadRequest(new { message = "Pet not created" });
+        }
+    }
+
+    [HttpPut("{petId}")]
+    public async Task<IActionResult> Update(int petId, [FromBody] CreatePetDto dto)
+    {
+        try
+        {
+            await _petService.UpdatePetAsync(petId, dto);
+            _logger.LogInformation($"Pet updated: {petId}");
+            return Ok();
+        }
+        catch (Exception exc)
+        {
+            _logger.LogError($"Pet not updated: {petId}, error:{exc}");
+            return BadRequest(new { message = "Pet not updated" });
+        }
+    }
+
+    [HttpDelete("{petId}")]
+    public async Task<IActionResult> Delete(int petId)
+    {
+        try
+        {
+            await _petService.RemoveUserPetAsync(petId);
+            _logger.LogInformation($"Pet deleted: {petId}");
+            return Ok();
+        }
+        catch (Exception exc)
+        {
+            _logger.LogError($"Pet not deleted: {petId}, error:{exc}");
+            return BadRequest(new { message = "Pet not deleted" });
+        }
+    }
 }

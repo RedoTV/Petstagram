@@ -18,13 +18,19 @@ public class PetRepository : IPetRepository
     {
         return await _dbContext.Pets
             .AsNoTracking()
+            .Include(p => p.PetType)
+            .Include(p => p.Photos)
             .Where(p => p.UserId == userId)
             .ToArrayAsync();
     }
 
     public async Task<Pet?> FindAsync(int petId)
     {
-        return await _dbContext.Pets.FindAsync(petId);
+        return await _dbContext.Pets
+            .AsNoTracking()
+            .Include(p => p.PetType)
+            .Include(p => p.Photos)
+            .FirstOrDefaultAsync(p => p.Id == petId);
     }
 
     public async Task<Pet> AddAsync(Pet pet)

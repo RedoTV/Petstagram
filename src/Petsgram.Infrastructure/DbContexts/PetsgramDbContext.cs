@@ -1,6 +1,5 @@
 using Petsgram.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Petsgram.Infrastructure.EntityConfigurations;
 using System.Reflection;
 
 namespace Petsgram.Infrastructure.DbContexts;
@@ -11,6 +10,8 @@ public class PetsgramDbContext : DbContext
 
     public DbSet<User> Users { get; set; }
     public DbSet<Pet> Pets { get; set; }
+    public DbSet<PetPhoto> PetPhotos { get; set; }
+    public DbSet<PetType> PetTypes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

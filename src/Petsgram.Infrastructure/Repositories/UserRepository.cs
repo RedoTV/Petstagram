@@ -19,15 +19,24 @@ public class UserRepository : IUserRepository
     {
         return await _dbContext.Users
             .AsNoTracking()
-            .Take(count)
+            .Include(u => u.Pets)
+                .ThenInclude(p => p.PetType)
+            .Include(u => u.Pets)
+                .ThenInclude(p => p.Photos)
             .Skip(skip)
+            .Take(count)
             .ToListAsync();
     }
 
     public async Task<User?> FindAsync(int id)
     {
-        //without error handling 
-        return await _dbContext.Users.FindAsync(id);
+        return await _dbContext.Users
+            .AsNoTracking()
+            .Include(u => u.Pets)
+                .ThenInclude(p => p.PetType)
+            .Include(u => u.Pets)
+                .ThenInclude(p => p.Photos)
+            .FirstOrDefaultAsync(u => u.Id == id);
     }
 
     public async Task<User> AddAsync(User user)
@@ -38,7 +47,6 @@ public class UserRepository : IUserRepository
 
     public async Task RemoveAsync(int userId)
     {
-        //with error handling
         var user = await FindAsync(userId);
         if (user == null)
             throw new ArgumentException($"User with id:{userId} not found");

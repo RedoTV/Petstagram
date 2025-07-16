@@ -2,6 +2,8 @@ using System.Threading.Tasks;
 using Petsgram.Application.Interfaces.Pets;
 using Petsgram.Application.Interfaces.UnitOfWork;
 using Petsgram.Application.Interfaces.Users;
+using Petsgram.Application.Interfaces.PetPhotos;
+using Petsgram.Application.Interfaces.PetTypes;
 using Petsgram.Infrastructure.DbContexts;
 using Petsgram.Infrastructure.Repositories;
 
@@ -13,6 +15,8 @@ public class UnitOfWork : IUnitOfWork
 
     private IPetRepository? _pets;
     private IUserRepository? _users;
+    private IPetPhotoRepository? _petPhotos;
+    private IPetTypeRepository? _petTypes;
 
     public UnitOfWork(PetsgramDbContext dbContext)
     {
@@ -38,6 +42,28 @@ public class UnitOfWork : IUnitOfWork
                 _users = new UserRepository(_dbContext);
 
             return _users;
+        }
+    }
+
+    public IPetPhotoRepository PetPhotos
+    {
+        get
+        {
+            if (_petPhotos == null)
+                _petPhotos = new PetPhotoRepository(_dbContext);
+
+            return _petPhotos;
+        }
+    }
+
+    public IPetTypeRepository PetTypes
+    {
+        get
+        {
+            if (_petTypes == null)
+                _petTypes = new PetTypeRepository(_dbContext);
+
+            return _petTypes;
         }
     }
 
