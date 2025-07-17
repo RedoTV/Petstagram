@@ -1,12 +1,9 @@
+using Petsgram.Application.Interfaces.Shared;
 using Petsgram.Domain.Entities;
 
 namespace Petsgram.Application.Interfaces.Pets;
 
-public interface IPetRepository
+public interface IPetRepository : IGenericRepository<Pet>
 {
-    Task<ICollection<Pet>> GetAsync(int userId);
-    Task<Pet> AddAsync(Pet pet);
-    Task RemoveAsync(int petId);
-
-    //update method not written
+    Task<IEnumerable<Pet>> GetAllAsync(int userId);
 }
