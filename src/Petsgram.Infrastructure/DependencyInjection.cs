@@ -18,8 +18,7 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddSqlServer<PetsgramDbContext>(configuration.GetConnectionString("DbConnection"),
-            b => b.MigrationsAssembly("Petsgram.WebAPI"));
+        services.AddSqlServer<PetsgramDbContext>(configuration.GetConnectionString("DbConnection"));
 
         services.AddScoped<IPetRepository, PetRepository>();
         services.AddScoped<IUserRepository, UserRepository>();

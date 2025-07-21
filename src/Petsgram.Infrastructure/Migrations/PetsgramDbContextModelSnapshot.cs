@@ -45,7 +45,7 @@ namespace Petsgram.WebAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Pets");
+                    b.ToTable("Pets", (string)null);
                 });
 
             modelBuilder.Entity("Petsgram.Domain.Entities.PetPhoto", b =>
@@ -71,7 +71,7 @@ namespace Petsgram.WebAPI.Migrations
 
                     b.HasIndex("PetId");
 
-                    b.ToTable("PetPhotos");
+                    b.ToTable("PetPhotos", (string)null);
                 });
 
             modelBuilder.Entity("Petsgram.Domain.Entities.PetType", b =>
@@ -88,7 +88,7 @@ namespace Petsgram.WebAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PetTypes");
+                    b.ToTable("PetTypes", (string)null);
                 });
 
             modelBuilder.Entity("Petsgram.Domain.Entities.User", b =>
@@ -105,7 +105,7 @@ namespace Petsgram.WebAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Petsgram.Domain.Entities.Pet", b =>

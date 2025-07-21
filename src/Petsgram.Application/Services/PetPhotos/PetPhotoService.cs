@@ -3,6 +3,8 @@ using Petsgram.Application.Interfaces.PetPhotos;
 using Petsgram.Application.Interfaces.UnitOfWork;
 using AutoMapper;
 using Petsgram.Domain.Entities;
+using Microsoft.Extensions.Options;
+using Petsgram.Application.Settings;
 
 namespace Petsgram.Application.Services.PetPhotos;
 
@@ -11,14 +13,21 @@ public class PetPhotoService : IPetPhotoService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    //values from appsettings.json
-    private static readonly string _photoPhysicalPath = "pet_photos";
-    private static readonly string _photoPublicPath = "/pet_photos";
+    private readonly string _photoPhysicalPath;
+    private readonly string _photoPublicPath;
 
-    public PetPhotoService(IUnitOfWork unitOfWork, IMapper mapper)
+    public PetPhotoService(IUnitOfWork unitOfWork, IMapper mapper, IOptions<StorageSettings> storageOptions)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+
+        _photoPhysicalPath = storageOptions.Value.PhotoPhysicalPath;
+        _photoPublicPath = storageOptions.Value.PhotoPublicPath;
+
+        if (string.IsNullOrEmpty(_photoPhysicalPath) || string.IsNullOrEmpty(_photoPublicPath))
+        {
+            throw new ArgumentException("Storage paths are not configured correctly.");
+        }
     }
 
     public async Task<IEnumerable<PetPhotoResponse>> GetAllByPetIdAsync(int petId)
@@ -70,8 +79,7 @@ public class PetPhotoService : IPetPhotoService
         if (photo == null)
             throw new NullReferenceException($"Photo (id:{id}) not found");
 
-        var removedFilePath = Path.Combine(Directory.GetCurrentDirectory(), photo.Path);
-        await Task.Run(() => File.Delete(removedFilePath));
+        await Task.Run(() => File.Delete(photo.Path));
 
         await _unitOfWork.PetPhotos.RemoveAsync(id);
         await _unitOfWork.CompleteAsync();
