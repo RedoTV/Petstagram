@@ -20,7 +20,7 @@ public class PetTypeService : IPetTypeService
     public async Task<IEnumerable<PetTypeResponse>> GetAllAsync()
     {
         var types = await _unitOfWork.PetTypes.GetAllAsync();
-        return types.Select(t => _mapper.Map<PetTypeResponse>(t));
+        return types.Select(t => _mapper.Map<PetTypeResponse>(t)).ToList();
     }
 
     public async Task<PetTypeResponse> GetByIdAsync(int id)
