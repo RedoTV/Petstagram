@@ -4,13 +4,12 @@ services:
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: mssql_database
-    environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=${DB_SA_PASSWORD}
+    env_file:
+      - ./.env
     ports:
       - "1433:1433"
     volumes:
-      - mssql_data:/var/opt/mssql
+      - ${LOCAL_PATH_MSSQL_DATA}:/var/opt/mssql
     healthcheck:
       test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${DB_SA_PASSWORD}", "-C", "-Q", "SELECT 1"]
       interval: 10s
@@ -18,14 +17,13 @@ services:
       retries: 5
       start_period: 30s
 
-
   db-migrator:
     container_name: db-migrator
     build:
       context: ..
       dockerfile: src/Petsgram.DbMigrator/Dockerfile
-    environment:
-      - ConnectionStrings__DbConnection=Server=db;Database=${DB_NAME};User=sa;Password=${DB_SA_PASSWORD};TrustServerCertificate=True
+    env_file:
+      - ./.env
     depends_on:
       db:
         condition: service_healthy
@@ -36,19 +34,12 @@ services:
     build:
       context: ..
       dockerfile: src/Petsgram.WebAPI/Dockerfile
+    env_file:
+      - ./.env
     ports:
       - "${APP_PORT}:${APP_PORT}" 
     volumes:
-      - petsgram_storage:${STORAGE__PHOTOPHYSICALPATH}
-    environment:
-      - ConnectionStrings__DbConnection=Server=db;Database=${DB_NAME};User=sa;Password=${DB_SA_PASSWORD};TrustServerCertificate=True
-      - ASPNETCORE_URLS=http://+:${APP_PORT}
-      - Storage__PhotoPhysicalPath=${STORAGE__PHOTOPHYSICALPATH}
-      - Storage__PhotoPublicPath=${STORAGE__PHOTOPUBLICPATH}
+      - ${LOCAL_PATH_PETSGRAM_STORAGE}:${STORAGE__PHOTOPHYSICALPATH}
     depends_on:
       db-migrator:
         condition: service_completed_successfully
-
-volumes:
-  mssql_data:
-  petsgram_storage:

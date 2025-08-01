@@ -9,6 +9,8 @@ using Petsgram.Infrastructure.UnitOfWork;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using UnitOfWorkImpl = Petsgram.Infrastructure.UnitOfWork.UnitOfWork;
+using Petsgram.Application.Interfaces.Auth;
+using Petsgram.Infrastructure.Services.Auth;
 
 namespace Petsgram.Infrastructure;
 
@@ -25,6 +27,8 @@ public static class DependencyInjection
         services.AddScoped<IPetPhotoRepository, PetPhotoRepository>();
         services.AddScoped<IPetTypeRepository, PetTypeRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWorkImpl>();
+
+        services.AddScoped<IAuthService, AuthService>();
 
         return services;
     }

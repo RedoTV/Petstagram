@@ -6,7 +6,8 @@ pet_photos/
 *.user
 *.userosscache
 *.sln.docstates
-*.env
+
+docker-data/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

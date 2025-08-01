@@ -16,11 +16,8 @@ namespace Petsgram.Application;
 public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(
-        this IServiceCollection services,
-        IConfiguration configuration)
+        this IServiceCollection services)
     {
-        services.Configure<StorageSettings>(configuration.GetSection(StorageSettings.SectionName));
-
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IPetService, PetService>();
         services.AddScoped<IPetPhotoService, PetPhotoService>();
