@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Petsgram.Application.Interfaces.Users;
 using Petsgram.Application.DTOs.Users;
 using Microsoft.Extensions.Logging;
@@ -8,10 +9,12 @@ namespace Petsgram.WebAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class UsersController : ControllerBase
 {
     private readonly ILogger<UsersController> _logger;
     private readonly IUserService _userService;
+
     public UsersController(ILogger<UsersController> logger, IUserService userService)
     {
         _logger = logger;
@@ -43,58 +46,37 @@ public class UsersController : ControllerBase
             _logger.LogInformation($"Returned user with id:{id}");
             return Ok(user);
         }
-        catch (Exception exc)
+        catch (ArgumentException ex)
         {
-            _logger.LogError($"User not found with id:{id}, error:{exc}");
-            return BadRequest(new { message = "User not found" });
-        }
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateUserDto dto)
-    {
-        try
-        {
-            await _userService.AddUserAsync(dto);
-            _logger.LogInformation($"User created: {dto.UserName}");
-            return Ok();
+            _logger.LogError($"User not found with id:{id}, error:{ex}");
+            return NotFound(new { message = ex.Message });
         }
         catch (Exception exc)
         {
-            _logger.LogError($"User not created, error:{exc}");
-            return BadRequest(new { message = "User not created" });
-        }
-    }
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] CreateUserDto dto)
-    {
-        try
-        {
-            await _userService.UpdateUserAsync(id, dto);
-            _logger.LogInformation($"User updated: {id}");
-            return Ok();
-        }
-        catch (Exception exc)
-        {
-            _logger.LogError($"User not updated: {id}, error:{exc}");
-            return BadRequest(new { message = "User not updated" });
+            _logger.LogError($"Error getting user with id:{id}, error:{exc}");
+            return BadRequest(new { message = "Error getting user" });
         }
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)
     {
         try
         {
             await _userService.RemoveUserAsync(id);
             _logger.LogInformation($"User deleted: {id}");
-            return Ok();
+            return Ok(new { message = "User deleted successfully" });
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogError($"User not found with id:{id}, error:{ex}");
+            return NotFound(new { message = ex.Message });
         }
         catch (Exception exc)
         {
             _logger.LogError($"User not deleted: {id}, error:{exc}");
-            return BadRequest(new { message = "User not deleted" });
+            return BadRequest(new { message = "Error deleting user" });
         }
     }
 }

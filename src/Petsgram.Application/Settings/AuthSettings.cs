@@ -10,6 +10,7 @@ public class AuthSettings
     public string Audience { get; set; } = string.Empty;
     public string SecretKey { get; set; } = string.Empty;
     public string AccessTokenExpireDays { get; set; } = string.Empty;
+    public string RefreshTokenExpireDays { get; set; } = string.Empty;
 
     public SymmetricSecurityKey GetSymmetricSecurityKey()
     {

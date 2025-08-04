@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Petsgram.Application.Interfaces.PetPhotos;
 using Petsgram.Application.DTOs.PetPhotos;
 using Microsoft.Extensions.Logging;
@@ -8,10 +9,12 @@ namespace Petsgram.WebAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class PetPhotosController : ControllerBase
 {
     private readonly ILogger<PetPhotosController> _logger;
     private readonly IPetPhotoService _petPhotoService;
+
     public PetPhotosController(ILogger<PetPhotosController> logger, IPetPhotoService petPhotoService)
     {
         _logger = logger;
@@ -45,11 +48,15 @@ public class PetPhotosController : ControllerBase
 
             return Ok(photo);
         }
+        catch (ArgumentException ex)
+        {
+            _logger.LogError($"Photo not found with id:{id}, error:{ex}");
+            return NotFound(new { message = ex.Message });
+        }
         catch (Exception exc)
         {
-            _logger.LogError($"Photo not found with id:{id}, error:{exc}");
-
-            return BadRequest(new { message = "Photo not found" });
+            _logger.LogError($"Error getting photo with id:{id}, error:{exc}");
+            return BadRequest(new { message = "Error getting photo" });
         }
     }
 
@@ -61,7 +68,17 @@ public class PetPhotosController : ControllerBase
             await _petPhotoService.RemovePhotoAsync(id);
             _logger.LogInformation($"Photo deleted: {id}");
 
-            return Ok(new { message = "Photo deleted: {id}" });
+            return Ok(new { message = "Photo deleted successfully" });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogError($"Unauthorized access: {ex.Message}");
+            return Unauthorized(new { message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogError($"Photo not found with id:{id}, error:{ex}");
+            return NotFound(new { message = ex.Message });
         }
         catch (Exception exc)
         {
@@ -71,21 +88,31 @@ public class PetPhotosController : ControllerBase
     }
 
     [HttpPost("upload")]
-    public async Task<IActionResult> Upload(int petId, int userId, IFormFile file)
+    public async Task<IActionResult> Upload(int petId, IFormFile file)
     {
         try
         {
             if (file == null || file.Length == 0)
-                return BadRequest("No file uploaded");
+                return BadRequest(new { message = "No file uploaded" });
 
-            await _petPhotoService.AddPhotoAsync(petId, userId, file.OpenReadStream(), file.FileName);
-            _logger.LogInformation($"Photo uploaded for pet {petId}, user {userId}");
+            await _petPhotoService.AddPhotoAsync(petId, file.OpenReadStream(), file.FileName);
+            _logger.LogInformation($"Photo uploaded for pet {petId}");
 
-            return Ok(new { message = $"Photo uploaded for pet {petId}, user {userId}" });
+            return Ok(new { message = "Photo uploaded successfully" });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogError($"Unauthorized access: {ex.Message}");
+            return Unauthorized(new { message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogError($"Pet not found with id:{petId}, error:{ex}");
+            return NotFound(new { message = ex.Message });
         }
         catch (Exception exc)
         {
-            _logger.LogError($"Photo not uploaded for pet {petId}, user {userId}, error:{exc}");
+            _logger.LogError($"Photo not uploaded for pet {petId}, error:{exc}");
             return BadRequest(new { message = "Photo not uploaded" });
         }
     }

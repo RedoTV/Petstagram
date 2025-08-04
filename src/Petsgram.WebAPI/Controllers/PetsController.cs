@@ -1,11 +1,13 @@
 using Petsgram.Application.DTOs.Pets;
 using Petsgram.Application.Interfaces.Pets;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Petsgram.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class PetsController : ControllerBase
 {
     private readonly ILogger<PetsController> _logger;
@@ -17,7 +19,28 @@ public class PetsController : ControllerBase
         _petService = petService;
     }
 
-    [HttpGet("by-user/{userId}")]
+    [HttpGet("my-pets")]
+    public async Task<IActionResult> GetCurrentUserPets()
+    {
+        try
+        {
+            var pets = await _petService.GetCurrentUserPetsAsync();
+            _logger.LogInformation($"Returned {pets.Count()} pets for current user");
+            return Ok(pets);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogError($"Unauthorized access: {ex.Message}");
+            return Unauthorized(new { message = ex.Message });
+        }
+        catch (Exception exc)
+        {
+            _logger.LogError($"Error getting current user pets: {exc}");
+            return BadRequest(new { message = "Error getting pets" });
+        }
+    }
+
+    [HttpGet("user/{userId}")]
     public async Task<IActionResult> GetAllByUser(int userId)
     {
         try
@@ -42,25 +65,35 @@ public class PetsController : ControllerBase
             _logger.LogInformation($"Returned pet with id:{petId}");
             return Ok(pet);
         }
+        catch (ArgumentException ex)
+        {
+            _logger.LogError($"Pet not found with id:{petId}, error:{ex}");
+            return NotFound(new { message = ex.Message });
+        }
         catch (Exception exc)
         {
-            _logger.LogError($"Pet not found with id:{petId}, error:{exc}");
-            return BadRequest(new { message = "Pet not found" });
+            _logger.LogError($"Error getting pet with id:{petId}, error:{exc}");
+            return BadRequest(new { message = "Error getting pet" });
         }
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(int userId, [FromBody] CreatePetDto dto)
+    public async Task<IActionResult> Create([FromBody] CreatePetDto dto)
     {
         try
         {
-            await _petService.AddPetToUserAsync(userId, dto);
-            _logger.LogInformation($"Pet created for user {userId}");
-            return Ok();
+            await _petService.AddPetToCurrentUserAsync(dto);
+            _logger.LogInformation("Pet created for current user");
+            return Ok(new { message = "Pet created successfully" });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogError($"Unauthorized access: {ex.Message}");
+            return Unauthorized(new { message = ex.Message });
         }
         catch (Exception exc)
         {
-            _logger.LogError($"Pet not created for user {userId}, error:{exc}");
+            _logger.LogError($"Pet not created, error:{exc}");
             return BadRequest(new { message = "Pet not created" });
         }
     }
@@ -72,7 +105,17 @@ public class PetsController : ControllerBase
         {
             await _petService.UpdatePetAsync(petId, dto);
             _logger.LogInformation($"Pet updated: {petId}");
-            return Ok();
+            return Ok(new { message = "Pet updated successfully" });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogError($"Unauthorized access: {ex.Message}");
+            return Unauthorized(new { message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogError($"Pet not found with id:{petId}, error:{ex}");
+            return NotFound(new { message = ex.Message });
         }
         catch (Exception exc)
         {
@@ -86,9 +129,19 @@ public class PetsController : ControllerBase
     {
         try
         {
-            await _petService.RemoveUserPetAsync(petId);
+            await _petService.RemovePetAsync(petId);
             _logger.LogInformation($"Pet deleted: {petId}");
-            return Ok();
+            return Ok(new { message = "Pet deleted successfully" });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogError($"Unauthorized access: {ex.Message}");
+            return Unauthorized(new { message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogError($"Pet not found with id:{petId}, error:{ex}");
+            return NotFound(new { message = ex.Message });
         }
         catch (Exception exc)
         {

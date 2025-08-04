@@ -10,6 +10,7 @@ using Petsgram.Application.Services.PetTypes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Petsgram.Application.Settings;
+using Petsgram.Application.Generators;
 
 namespace Petsgram.Application;
 
@@ -23,6 +24,8 @@ public static class DependencyInjection
         services.AddScoped<IPetPhotoService, PetPhotoService>();
         services.AddScoped<IPetTypeService, PetTypeService>();
 
+        services.AddScoped<ITokenGenerator, TokenGenerator>();
+
         services.AddAutoMapper(
             typeof(UserProfile),
             typeof(PetProfile),
@@ -33,4 +36,3 @@ public static class DependencyInjection
         return services;
     }
 }
-

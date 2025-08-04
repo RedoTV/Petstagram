@@ -1,5 +1,6 @@
 using Petsgram.Application.DTOs.Pets;
 using Petsgram.Application.Interfaces.Pets;
+using Petsgram.Application.Interfaces.Auth;
 using AutoMapper;
 using Petsgram.Domain.Entities;
 using Petsgram.Application.Interfaces.UnitOfWork;
@@ -10,11 +11,23 @@ public class PetService : IPetService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly ICurrentUserService _currentUserService;
 
-    public PetService(IUnitOfWork unitOfWork, IMapper mapper)
+    public PetService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _currentUserService = currentUserService;
+    }
+
+    public async Task<IEnumerable<PetResponse>> GetCurrentUserPetsAsync()
+    {
+        var currentUserId = _currentUserService.GetCurrentUserId();
+        if (currentUserId == null)
+            throw new UnauthorizedAccessException("User not authenticated");
+
+        var pets = await _unitOfWork.Pets.GetAllAsync(currentUserId.Value);
+        return pets.Select(p => _mapper.Map<PetResponse>(p));
     }
 
     public async Task<IEnumerable<PetResponse>> GetUserPetsAsync(int userId)
@@ -32,8 +45,12 @@ public class PetService : IPetService
         return _mapper.Map<PetResponse>(pet);
     }
 
-    public async Task AddPetToUserAsync(int userId, CreatePetDto petDto)
+    public async Task AddPetToCurrentUserAsync(CreatePetDto petDto)
     {
+        var currentUserId = _currentUserService.GetCurrentUserId();
+        if (currentUserId == null)
+            throw new UnauthorizedAccessException("User not authenticated");
+
         var petType = (await _unitOfWork.PetTypes.GetAllAsync())
             .FirstOrDefault(pt => pt.Name == petDto.PetType);
         if (petType == null)
@@ -43,7 +60,7 @@ public class PetService : IPetService
         }
 
         var pet = _mapper.Map<Pet>(petDto);
-        pet.UserId = userId;
+        pet.UserId = currentUserId.Value;
         pet.PetTypeId = petType.Id;
 
         await _unitOfWork.Pets.AddAsync(pet);
@@ -52,9 +69,16 @@ public class PetService : IPetService
 
     public async Task UpdatePetAsync(int petId, CreatePetDto petDto)
     {
+        var currentUserId = _currentUserService.GetCurrentUserId();
+        if (currentUserId == null)
+            throw new UnauthorizedAccessException("User not authenticated");
+
         var pet = await _unitOfWork.Pets.FindAsync(petId);
         if (pet == null)
             throw new ArgumentException($"Pet with id:{petId} not found");
+
+        if (pet.UserId != currentUserId.Value)
+            throw new UnauthorizedAccessException("You can only update your own pets");
 
         var petType = (await _unitOfWork.PetTypes.GetAllAsync())
             .FirstOrDefault(pt => pt.Name == petDto.PetType);
@@ -71,8 +95,19 @@ public class PetService : IPetService
         await _unitOfWork.CompleteAsync();
     }
 
-    public async Task RemoveUserPetAsync(int petId)
+    public async Task RemovePetAsync(int petId)
     {
+        var currentUserId = _currentUserService.GetCurrentUserId();
+        if (currentUserId == null)
+            throw new UnauthorizedAccessException("User not authenticated");
+
+        var pet = await _unitOfWork.Pets.FindAsync(petId);
+        if (pet == null)
+            throw new ArgumentException($"Pet with id:{petId} not found");
+
+        if (pet.UserId != currentUserId.Value)
+            throw new UnauthorizedAccessException("You can only delete your own pets");
+
         await _unitOfWork.Pets.RemoveAsync(petId);
         await _unitOfWork.CompleteAsync();
     }

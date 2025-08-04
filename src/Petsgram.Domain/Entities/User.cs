@@ -10,4 +10,5 @@ public class User
     public AuthRoles Role { get; set; }
 
     public List<Pet> Pets { get; set; } = [];
+    public List<RefreshToken> RefreshTokens { get; set; } = [];
 }

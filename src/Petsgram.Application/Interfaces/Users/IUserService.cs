@@ -6,7 +6,8 @@ public interface IUserService
 {
     Task<IEnumerable<UserResponse>> GetAllAsync(int count, int skip);
     Task<UserResponse> GetByIdAsync(int id);
-    Task AddUserAsync(CreateUserDto user);
-    Task UpdateUserAsync(int id, CreateUserDto user);
+    Task<AuthResponseDto> RegisterAsync(CreateUserDto userDto);
+    Task<AuthResponseDto> LoginAsync(LoginDto loginDto);
+    Task<AuthResponseDto> RefreshTokenAsync(string refreshToken);
     Task RemoveUserAsync(int id);
 }

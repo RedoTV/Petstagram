@@ -12,6 +12,7 @@ public class PetsgramDbContext : DbContext
     public DbSet<Pet> Pets { get; set; }
     public DbSet<PetPhoto> PetPhotos { get; set; }
     public DbSet<PetType> PetTypes { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

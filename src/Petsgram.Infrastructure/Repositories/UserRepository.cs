@@ -39,6 +39,24 @@ public class UserRepository : IUserRepository
             .FirstOrDefaultAsync(u => u.Id == id);
     }
 
+    public async Task<User?> GetByUserNameAsync(string userName)
+    {
+        return await _dbContext.Users
+            .AsNoTracking()
+            .Include(u => u.Pets)
+                .ThenInclude(p => p.PetType)
+            .Include(u => u.Pets)
+                .ThenInclude(p => p.Photos)
+            .FirstOrDefaultAsync(u => u.UserName == userName);
+    }
+
+    public async Task<bool> UserNameExistsAsync(string userName)
+    {
+        return await _dbContext.Users
+            .AsNoTracking()
+            .AnyAsync(u => u.UserName == userName);
+    }
+
     public async Task<User> AddAsync(User user)
     {
         await _dbContext.Users.AddAsync(user);
@@ -59,7 +77,7 @@ public class UserRepository : IUserRepository
         await _dbContext.Users
             .Where(u => u.Id == user.Id)
             .ExecuteUpdateAsync(setter =>
-                setter.SetProperty(u => u.UserName, user.UserName
-            ));
+                setter.SetProperty(u => u.UserName, user.UserName)
+            );
     }
 }

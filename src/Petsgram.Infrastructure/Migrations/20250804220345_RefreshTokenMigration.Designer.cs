@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Petsgram.Infrastructure.DbContexts;
 
@@ -11,9 +12,11 @@ using Petsgram.Infrastructure.DbContexts;
 namespace Petsgram.WebAPI.Migrations
 {
     [DbContext(typeof(PetsgramDbContext))]
-    partial class PetsgramDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250804220345_RefreshTokenMigration")]
+    partial class RefreshTokenMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
