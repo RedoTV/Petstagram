@@ -7,5 +7,5 @@ public interface ICurrentUserService
     int? GetCurrentUserId();
     string? GetCurrentUserName();
     string? GetCurrentUserRole();
-    Task<User?> GetCurrentUserAsync();
+    Task<User?> GetCurrentUserAsync(CancellationToken cancellationToken = default);
 }

@@ -4,10 +4,10 @@ namespace Petsgram.Application.Interfaces.Users;
 
 public interface IUserService
 {
-    Task<IEnumerable<UserResponse>> GetAllAsync(int count, int skip);
-    Task<UserResponse> GetByIdAsync(int id);
-    Task<AuthResponseDto> RegisterAsync(CreateUserDto userDto);
-    Task<AuthResponseDto> LoginAsync(LoginDto loginDto);
-    Task<AuthResponseDto> RefreshTokenAsync(string refreshToken);
+    Task<List<UserResponse>> GetAllAsync(int count, int skip, CancellationToken cancellationToken = default);
+    Task<UserResponse> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<AuthResponseDto> RegisterAsync(CreateUserDto userDto, CancellationToken cancellationToken = default);
+    Task<AuthResponseDto> LoginAsync(LoginDto loginDto, CancellationToken cancellationToken = default);
+    Task<AuthResponseDto> RefreshTokenAsync(string accessToken, string refreshToken, CancellationToken cancellationToken = default);
     Task RemoveUserAsync(int id);
 }

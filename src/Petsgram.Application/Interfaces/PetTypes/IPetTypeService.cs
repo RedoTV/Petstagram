@@ -4,9 +4,9 @@ namespace Petsgram.Application.Interfaces.PetTypes;
 
 public interface IPetTypeService
 {
-    Task<IEnumerable<PetTypeResponse>> GetAllAsync();
-    Task<PetTypeResponse> GetByIdAsync(int id);
-    Task AddTypeAsync(string name);
-    Task RemoveTypeAsync(int id);
-    Task UpdateTypeAsync(int id, string name);
+    Task<List<PetTypeResponse>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<PetTypeResponse> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task AddTypeAsync(string name, CancellationToken cancellationToken = default);
+    Task RemoveTypeAsync(int id, CancellationToken cancellationToken = default);
+    Task UpdateTypeAsync(int id, string name, CancellationToken cancellationToken = default);
 }

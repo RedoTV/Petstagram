@@ -1,83 +1,56 @@
-using Microsoft.EntityFrameworkCore;
-using Petsgram.Application.DTOs.Users;
 using Petsgram.Application.Interfaces.Users;
 using Petsgram.Domain.Entities;
 using Petsgram.Infrastructure.DbContexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Petsgram.Infrastructure.Repositories;
 
 public class UserRepository : IUserRepository
 {
-    private readonly PetsgramDbContext _dbContext;
+    private readonly PetsgramDbContext _context;
 
-    public UserRepository(PetsgramDbContext dbContext)
+    public UserRepository(PetsgramDbContext context)
     {
-        _dbContext = dbContext;
+        _context = context;
     }
 
-    public async Task<IEnumerable<User>> GetAllAsync(int count, int skip)
+    public Task<List<User>> GetAllAsync(int count, int skip, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Users
-            .AsNoTracking()
-            .Include(u => u.Pets)
-                .ThenInclude(p => p.PetType)
-            .Include(u => u.Pets)
-                .ThenInclude(p => p.Photos)
-            .Skip(skip)
-            .Take(count)
-            .ToListAsync();
+        return _context.Users.Skip(skip).Take(count).ToListAsync(cancellationToken);
     }
 
-    public async Task<User?> FindAsync(int id)
+    public Task<User?> FindAsync(int id, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Users
-            .AsNoTracking()
-            .Include(u => u.Pets)
-                .ThenInclude(p => p.PetType)
-            .Include(u => u.Pets)
-                .ThenInclude(p => p.Photos)
-            .FirstOrDefaultAsync(u => u.Id == id);
+        return _context.Users.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
-    public async Task<User?> GetByUserNameAsync(string userName)
+    public async Task<User> AddAsync(User entity, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Users
-            .AsNoTracking()
-            .Include(u => u.Pets)
-                .ThenInclude(p => p.PetType)
-            .Include(u => u.Pets)
-                .ThenInclude(p => p.Photos)
-            .FirstOrDefaultAsync(u => u.UserName == userName);
+        if (entity == null)
+            throw new ArgumentNullException(nameof(entity));
+
+        var result = await _context.Users.AddAsync(entity, cancellationToken);
+        return result.Entity;
     }
 
-    public async Task<bool> UserNameExistsAsync(string userName)
+    public Task UpdateAsync(User entity, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Users
-            .AsNoTracking()
-            .AnyAsync(u => u.UserName == userName);
+        _context.Users.Update(entity);
+        return Task.CompletedTask;
     }
 
-    public async Task<User> AddAsync(User user)
+    public async Task RemoveAsync(int id, CancellationToken cancellationToken = default)
     {
-        await _dbContext.Users.AddAsync(user);
-        return user;
+        await _context.Users.Where(x => x.Id == id).ExecuteDeleteAsync(cancellationToken);
     }
 
-    public async Task RemoveAsync(int userId)
+    public Task<User?> GetByUserNameAsync(string userName, CancellationToken cancellationToken = default)
     {
-        var user = await FindAsync(userId);
-        if (user == null)
-            throw new ArgumentException($"User with id:{userId} not found");
-
-        _dbContext.Users.Remove(user);
+        return _context.Users.FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
     }
 
-    public async Task UpdateAsync(User user)
+    public Task<bool> UserNameExistsAsync(string userName, CancellationToken cancellationToken = default)
     {
-        await _dbContext.Users
-            .Where(u => u.Id == user.Id)
-            .ExecuteUpdateAsync(setter =>
-                setter.SetProperty(u => u.UserName, user.UserName)
-            );
+        return _context.Users.AnyAsync(u => u.UserName == userName, cancellationToken);
     }
 }

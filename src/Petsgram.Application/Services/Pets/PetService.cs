@@ -1,114 +1,105 @@
 using Petsgram.Application.DTOs.Pets;
 using Petsgram.Application.Interfaces.Pets;
+using Petsgram.Application.Interfaces.UnitOfWork;
 using Petsgram.Application.Interfaces.Auth;
+using Petsgram.Application.Interfaces.PetTypes;
 using AutoMapper;
 using Petsgram.Domain.Entities;
-using Petsgram.Application.Interfaces.UnitOfWork;
 
 namespace Petsgram.Application.Services.Pets;
 
 public class PetService : IPetService
 {
+    private readonly IPetRepository _petRepository;
+    private readonly IPetTypeRepository _petTypeRepository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IMapper _mapper;
 
-    public PetService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService)
+    public PetService(
+        IPetRepository petRepository,
+        IPetTypeRepository petTypeRepository,
+        IUnitOfWork unitOfWork,
+        ICurrentUserService currentUserService,
+        IMapper mapper)
     {
+        _petRepository = petRepository;
+        _petTypeRepository = petTypeRepository;
         _unitOfWork = unitOfWork;
-        _mapper = mapper;
         _currentUserService = currentUserService;
+        _mapper = mapper;
     }
 
-    public async Task<IEnumerable<PetResponse>> GetCurrentUserPetsAsync()
+    public async Task<List<PetResponse>> GetCurrentUserPetsAsync(CancellationToken cancellationToken = default)
     {
-        var currentUserId = _currentUserService.GetCurrentUserId();
-        if (currentUserId == null)
+        var currentUser = await _currentUserService.GetCurrentUserAsync(cancellationToken);
+        if (currentUser == null)
             throw new UnauthorizedAccessException("User not authenticated");
 
-        var pets = await _unitOfWork.Pets.GetAllAsync(currentUserId.Value);
-        return pets.Select(p => _mapper.Map<PetResponse>(p));
+        var pets = await _petRepository.GetAllAsync(currentUser.Id, cancellationToken);
+        return pets.Select(p => _mapper.Map<PetResponse>(p)).ToList();
     }
 
-    public async Task<IEnumerable<PetResponse>> GetUserPetsAsync(int userId)
+    public async Task<List<PetResponse>> GetUserPetsAsync(int userId, CancellationToken cancellationToken = default)
     {
-        var pets = await _unitOfWork.Pets.GetAllAsync(userId);
-        return pets.Select(p => _mapper.Map<PetResponse>(p));
+        var pets = await _petRepository.GetAllAsync(userId, cancellationToken);
+        return pets.Select(p => _mapper.Map<PetResponse>(p)).ToList();
     }
 
-    public async Task<PetResponse> GetPetByIdAsync(int petId)
+    public async Task<PetResponse> GetPetByIdAsync(int petId, CancellationToken cancellationToken = default)
     {
-        var pet = await _unitOfWork.Pets.FindAsync(petId);
+        var pet = await _petRepository.FindAsync(petId, cancellationToken);
         if (pet == null)
             throw new ArgumentException($"Pet with id:{petId} not found");
 
         return _mapper.Map<PetResponse>(pet);
     }
 
-    public async Task AddPetToCurrentUserAsync(CreatePetDto petDto)
+    public async Task AddPetToCurrentUserAsync(CreatePetDto dto, CancellationToken cancellationToken = default)
     {
-        var currentUserId = _currentUserService.GetCurrentUserId();
-        if (currentUserId == null)
+        var currentUser = await _currentUserService.GetCurrentUserAsync(cancellationToken);
+        if (currentUser == null)
             throw new UnauthorizedAccessException("User not authenticated");
 
-        var petType = (await _unitOfWork.PetTypes.GetAllAsync())
-            .FirstOrDefault(pt => pt.Name == petDto.PetType);
+        var petType = await _petTypeRepository.GetByNameAsync(dto.PetType, cancellationToken);
         if (petType == null)
         {
-            petType = new PetType { Name = petDto.PetType };
-            await _unitOfWork.PetTypes.AddAsync(petType);
+            throw new ArgumentException($"Pet type '{dto.PetType}' not found.");
         }
 
-        var pet = _mapper.Map<Pet>(petDto);
-        pet.UserId = currentUserId.Value;
-        pet.PetTypeId = petType.Id;
+        var pet = new Pet
+        {
+            PetName = dto.PetName,
+            PetType = petType,
+            UserId = currentUser.Id
+        };
 
-        await _unitOfWork.Pets.AddAsync(pet);
-        await _unitOfWork.CompleteAsync();
+        await _petRepository.AddAsync(pet, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task UpdatePetAsync(int petId, CreatePetDto petDto)
+    public async Task UpdatePetAsync(int petId, CreatePetDto dto, CancellationToken cancellationToken = default)
     {
-        var currentUserId = _currentUserService.GetCurrentUserId();
-        if (currentUserId == null)
-            throw new UnauthorizedAccessException("User not authenticated");
-
-        var pet = await _unitOfWork.Pets.FindAsync(petId);
+        var pet = await _petRepository.FindAsync(petId, cancellationToken);
         if (pet == null)
             throw new ArgumentException($"Pet with id:{petId} not found");
 
-        if (pet.UserId != currentUserId.Value)
-            throw new UnauthorizedAccessException("You can only update your own pets");
-
-        var petType = (await _unitOfWork.PetTypes.GetAllAsync())
-            .FirstOrDefault(pt => pt.Name == petDto.PetType);
+        var petType = await _petTypeRepository.GetByNameAsync(dto.PetType, cancellationToken);
         if (petType == null)
         {
-            petType = new PetType { Name = petDto.PetType };
-            await _unitOfWork.PetTypes.AddAsync(petType);
+            throw new ArgumentException($"Pet type '{dto.PetType}' not found.");
         }
 
-        pet.PetName = petDto.PetName;
+        pet.PetName = dto.PetName;
         pet.PetTypeId = petType.Id;
 
-        await _unitOfWork.Pets.UpdateAsync(pet);
-        await _unitOfWork.CompleteAsync();
+        await _petRepository.UpdateAsync(pet, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task RemovePetAsync(int petId)
+    public async Task RemovePetAsync(int petId, CancellationToken cancellationToken = default)
     {
-        var currentUserId = _currentUserService.GetCurrentUserId();
-        if (currentUserId == null)
-            throw new UnauthorizedAccessException("User not authenticated");
-
-        var pet = await _unitOfWork.Pets.FindAsync(petId);
-        if (pet == null)
-            throw new ArgumentException($"Pet with id:{petId} not found");
-
-        if (pet.UserId != currentUserId.Value)
-            throw new UnauthorizedAccessException("You can only delete your own pets");
-
-        await _unitOfWork.Pets.RemoveAsync(petId);
-        await _unitOfWork.CompleteAsync();
+        await _petRepository.RemoveAsync(petId, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

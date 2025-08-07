@@ -16,11 +16,11 @@ public class PetTypesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
     {
         try
         {
-            var types = await _petTypeService.GetAllAsync();
+            var types = await _petTypeService.GetAllAsync(cancellationToken);
             _logger.LogInformation($"Returned {types.Count()} pet types");
             return Ok(types);
         }
@@ -32,11 +32,11 @@ public class PetTypesController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken = default)
     {
         try
         {
-            var type = await _petTypeService.GetByIdAsync(id);
+            var type = await _petTypeService.GetByIdAsync(id, cancellationToken);
             _logger.LogInformation($"Returned pet type with id:{id}");
             return Ok(type);
         }
@@ -48,11 +48,11 @@ public class PetTypesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromQuery] string name)
+    public async Task<IActionResult> Create([FromQuery] string name, CancellationToken cancellationToken = default)
     {
         try
         {
-            await _petTypeService.AddTypeAsync(name);
+            await _petTypeService.AddTypeAsync(name, cancellationToken);
             _logger.LogInformation($"Pet type created: {name}");
             return Ok();
         }
@@ -64,11 +64,11 @@ public class PetTypesController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromQuery] string name)
+    public async Task<IActionResult> Update(int id, [FromQuery] string name, CancellationToken cancellationToken = default)
     {
         try
         {
-            await _petTypeService.UpdateTypeAsync(id, name);
+            await _petTypeService.UpdateTypeAsync(id, name, cancellationToken);
             _logger.LogInformation($"Pet type updated: {id}");
             return Ok();
         }
@@ -80,11 +80,11 @@ public class PetTypesController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken = default)
     {
         try
         {
-            await _petTypeService.RemoveTypeAsync(id);
+            await _petTypeService.RemoveTypeAsync(id, cancellationToken);
             _logger.LogInformation($"Pet type deleted: {id}");
             return Ok();
         }

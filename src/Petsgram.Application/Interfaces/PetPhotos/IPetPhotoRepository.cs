@@ -5,5 +5,5 @@ namespace Petsgram.Application.Interfaces.PetPhotos;
 
 public interface IPetPhotoRepository : IGenericRepository<PetPhoto>
 {
-    Task<IEnumerable<PetPhoto>> GetAllAsync(int petId);
+    Task<List<PetPhoto>> GetAllAsync(int petId, CancellationToken cancellationToken = default);
 }

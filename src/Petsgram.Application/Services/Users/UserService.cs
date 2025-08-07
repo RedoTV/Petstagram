@@ -1,58 +1,60 @@
 using Petsgram.Application.DTOs.Users;
 using Petsgram.Application.Interfaces.Users;
 using Petsgram.Application.Interfaces.Auth;
+using Petsgram.Application.Interfaces.UnitOfWork;
 using Petsgram.Application.Generators;
 using AutoMapper;
 using Petsgram.Domain.Entities;
-using Petsgram.Application.Interfaces.UnitOfWork;
 using Petsgram.Domain.Enums;
 
 namespace Petsgram.Application.Services.Users;
 
 public class UserService : IUserService
 {
+    private readonly IUserRepository _userRepository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
-    private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenGenerator _tokenGenerator;
     private readonly IRefreshTokenService _refreshTokenService;
+    private readonly IPasswordHasher _passwordHasher;
+    private readonly IMapper _mapper;
 
     public UserService(
+        IUserRepository userRepository,
         IUnitOfWork unitOfWork,
-        IMapper mapper,
-        IPasswordHasher passwordHasher,
         ITokenGenerator tokenGenerator,
-        IRefreshTokenService refreshTokenService)
+        IRefreshTokenService refreshTokenService,
+        IPasswordHasher passwordHasher,
+        IMapper mapper)
     {
+        _userRepository = userRepository;
         _unitOfWork = unitOfWork;
-        _mapper = mapper;
-        _passwordHasher = passwordHasher;
         _tokenGenerator = tokenGenerator;
         _refreshTokenService = refreshTokenService;
+        _passwordHasher = passwordHasher;
+        _mapper = mapper;
     }
 
-    public async Task<IEnumerable<UserResponse>> GetAllAsync(int count, int skip)
+    public async Task<List<UserResponse>> GetAllAsync(int count, int skip, CancellationToken cancellationToken = default)
     {
-        var users = await _unitOfWork.Users.GetAllAsync(count, skip);
-        return users.Select(u => _mapper.Map<UserResponse>(u));
+        var users = await _userRepository.GetAllAsync(count, skip, cancellationToken);
+        return users.Select(u => _mapper.Map<UserResponse>(u)).ToList();
     }
 
-    public async Task<UserResponse> GetByIdAsync(int id)
+    public async Task<UserResponse> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var user = await _unitOfWork.Users.FindAsync(id);
+        var user = await _userRepository.FindAsync(id, cancellationToken);
         if (user == null)
             throw new ArgumentException($"User with id:{id} not found");
 
         return _mapper.Map<UserResponse>(user);
     }
 
-    public async Task<AuthResponseDto> RegisterAsync(CreateUserDto userDto)
+    public async Task<AuthResponseDto> RegisterAsync(CreateUserDto userDto, CancellationToken cancellationToken = default)
     {
-        if (await _unitOfWork.Users.UserNameExistsAsync(userDto.UserName))
-            throw new InvalidOperationException($"User with username '{userDto.UserName}' already exists");
+        if (await _userRepository.UserNameExistsAsync(userDto.UserName, cancellationToken))
+            throw new ArgumentException($"User with username:{userDto.UserName} already exists");
 
         var hashedPassword = _passwordHasher.HashPassword(userDto.Password);
-
         var user = new User
         {
             UserName = userDto.UserName,
@@ -60,71 +62,71 @@ public class UserService : IUserService
             Role = AuthRoles.PetOwner
         };
 
-        await _unitOfWork.Users.AddAsync(user);
-        await _unitOfWork.CompleteAsync();
+        await _userRepository.AddAsync(user, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         var token = _tokenGenerator.GenerateToken(user);
-        var userResponse = _mapper.Map<UserResponse>(user);
-
-        await _refreshTokenService.StoreRefreshToken(user.Id, token.RefreshToken);
+        await _refreshTokenService.StoreRefreshToken(user.Id, token.RefreshToken, cancellationToken);
 
         return new AuthResponseDto
         {
             AccessToken = token.AccessToken,
             RefreshToken = token.RefreshToken,
-            CreatedAt = token.CreatedAt,
             ExpiresAt = token.ExpiresAt,
-            User = userResponse
+            User = _mapper.Map<UserResponse>(user)
         };
     }
 
-    public async Task<AuthResponseDto> LoginAsync(LoginDto loginDto)
+    public async Task<AuthResponseDto> LoginAsync(LoginDto loginDto, CancellationToken cancellationToken = default)
     {
-        var user = await _unitOfWork.Users.GetByUserNameAsync(loginDto.UserName);
-        if (user == null)
+        var user = await _userRepository.GetByUserNameAsync(loginDto.UserName, cancellationToken);
+        if (user == null || !_passwordHasher.VerifyPassword(loginDto.Password, user.HashedPassword))
+        {
             throw new InvalidOperationException("Invalid username or password");
-
-        if (!_passwordHasher.VerifyPassword(loginDto.Password, user.HashedPassword))
-            throw new InvalidOperationException("Invalid username or password");
+        }
 
         var token = _tokenGenerator.GenerateToken(user);
-        var userResponse = _mapper.Map<UserResponse>(user);
 
-        await _refreshTokenService.StoreRefreshToken(user.Id, token.RefreshToken);
+        await _refreshTokenService.StoreRefreshToken(user.Id, token.RefreshToken, cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return new AuthResponseDto
         {
             AccessToken = token.AccessToken,
             RefreshToken = token.RefreshToken,
-            CreatedAt = token.CreatedAt,
             ExpiresAt = token.ExpiresAt,
-            User = userResponse
+            User = _mapper.Map<UserResponse>(user)
         };
     }
 
-    public async Task<AuthResponseDto> RefreshTokenAsync(string refreshToken)
+    public async Task<AuthResponseDto> RefreshTokenAsync(string accessToken, string refreshToken, CancellationToken cancellationToken = default)
     {
-        var newToken = await _refreshTokenService.RefreshTokenAsync(refreshToken);
-        var user = await _refreshTokenService.GetUserFromRefreshTokenAsync(newToken.RefreshToken);
-
+        var user = await _refreshTokenService.GetUserFromRefreshTokenAsync(refreshToken, cancellationToken);
         if (user == null)
-            throw new InvalidOperationException("User not found");
+            throw new ArgumentException("User not found");
 
-        var userResponse = _mapper.Map<UserResponse>(user);
+        var newToken = await _refreshTokenService.RefreshTokenAsync(accessToken, refreshToken, cancellationToken);
 
         return new AuthResponseDto
         {
             AccessToken = newToken.AccessToken,
             RefreshToken = newToken.RefreshToken,
-            CreatedAt = newToken.CreatedAt,
             ExpiresAt = newToken.ExpiresAt,
-            User = userResponse
+            User = _mapper.Map<UserResponse>(user)
         };
     }
 
+
     public async Task RemoveUserAsync(int id)
     {
-        await _unitOfWork.Users.RemoveAsync(id);
-        await _unitOfWork.CompleteAsync();
+        var user = await _userRepository.FindAsync(id);
+        if (user == null)
+            throw new KeyNotFoundException($"User with id {id} not found");
+
+        await _refreshTokenService.RevokeAllUserTokensAsync(id);
+
+        await _userRepository.RemoveAsync(id);
+        await _unitOfWork.SaveChangesAsync();
     }
 }

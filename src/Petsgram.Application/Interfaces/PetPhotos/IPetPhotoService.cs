@@ -4,8 +4,8 @@ namespace Petsgram.Application.Interfaces.PetPhotos;
 
 public interface IPetPhotoService
 {
-    Task<IEnumerable<PetPhotoResponse>> GetAllByPetIdAsync(int petId);
-    Task<PetPhotoResponse> GetByIdAsync(int id);
-    Task AddPhotoAsync(int petId, Stream fileStream, string fileName);
-    Task RemovePhotoAsync(int id);
+    Task<List<PetPhotoResponse>> GetAllByPetIdAsync(int petId, CancellationToken cancellationToken = default);
+    Task<PetPhotoResponse> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task AddPhotoAsync(int petId, int userId, Stream fileStream, string fileName, CancellationToken cancellationToken = default);
+    Task RemovePhotoAsync(int id, CancellationToken cancellationToken = default);
 }

@@ -1,6 +1,5 @@
 using Petsgram.Application.DTOs.PetPhotos;
 using Petsgram.Application.Interfaces.PetPhotos;
-using Petsgram.Application.Interfaces.Auth;
 using Petsgram.Application.Interfaces.UnitOfWork;
 using AutoMapper;
 using Petsgram.Domain.Entities;
@@ -13,7 +12,7 @@ public class PetPhotoService : IPetPhotoService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    private readonly ICurrentUserService _currentUserService;
+    private readonly IPetPhotoRepository _petPhotoRepository;
 
     private readonly string _photoPhysicalPath;
     private readonly string _photoPublicPath;
@@ -21,12 +20,12 @@ public class PetPhotoService : IPetPhotoService
     public PetPhotoService(
         IUnitOfWork unitOfWork,
         IMapper mapper,
-        ICurrentUserService currentUserService,
+        IPetPhotoRepository petPhotoRepository,
         IOptions<StorageSettings> storageOptions)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
-        _currentUserService = currentUserService;
+        _petPhotoRepository = petPhotoRepository;
 
         _photoPhysicalPath = storageOptions.Value.PhotoPhysicalPath;
         _photoPublicPath = storageOptions.Value.PhotoPublicPath;
@@ -37,35 +36,24 @@ public class PetPhotoService : IPetPhotoService
         }
     }
 
-    public async Task<IEnumerable<PetPhotoResponse>> GetAllByPetIdAsync(int petId)
+    public async Task<List<PetPhotoResponse>> GetAllByPetIdAsync(int petId, CancellationToken cancellationToken = default)
     {
-        var photos = await _unitOfWork.PetPhotos.GetAllAsync(petId);
-        return photos.Select(p => _mapper.Map<PetPhotoResponse>(p));
+        var photos = await _petPhotoRepository.GetAllAsync(petId, cancellationToken);
+        return photos.Select(p => _mapper.Map<PetPhotoResponse>(p)).ToList();
     }
 
-    public async Task<PetPhotoResponse> GetByIdAsync(int id)
+    public async Task<PetPhotoResponse> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var photo = await _unitOfWork.PetPhotos.FindAsync(id);
+        var photo = await _petPhotoRepository.FindAsync(id, cancellationToken);
         if (photo == null)
             throw new ArgumentException($"PetPhoto with id:{id} not found");
 
         return _mapper.Map<PetPhotoResponse>(photo);
     }
 
-    public async Task AddPhotoAsync(int petId, Stream fileStream, string fileName)
+    public async Task AddPhotoAsync(int petId, int userId, Stream fileStream, string fileName, CancellationToken cancellationToken = default)
     {
-        var currentUserId = _currentUserService.GetCurrentUserId();
-        if (currentUserId == null)
-            throw new UnauthorizedAccessException("User not authenticated");
-
-        var pet = await _unitOfWork.Pets.FindAsync(petId);
-        if (pet == null)
-            throw new ArgumentException($"Pet with id:{petId} not found");
-
-        if (pet.UserId != currentUserId.Value)
-            throw new UnauthorizedAccessException("You can only add photos to your own pets");
-
-        var userFolder = $"user_{currentUserId.Value}";
+        var userFolder = $"user_{userId}";
         var ext = Path.GetExtension(fileName);
         var uniqueName = $"photo_{Guid.NewGuid()}{ext}";
 
@@ -76,7 +64,7 @@ public class PetPhotoService : IPetPhotoService
 
         using (var stream = new FileStream(filePath, FileMode.Create))
         {
-            await fileStream.CopyToAsync(stream);
+            await fileStream.CopyToAsync(stream, cancellationToken);
         }
 
         var publicUrl = $"{_photoPublicPath}/{userFolder}/{uniqueName}";
@@ -87,30 +75,20 @@ public class PetPhotoService : IPetPhotoService
             PublicUrl = publicUrl
         };
 
-        await _unitOfWork.PetPhotos.AddAsync(photo);
-        await _unitOfWork.CompleteAsync();
+        await _petPhotoRepository.AddAsync(photo, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task RemovePhotoAsync(int id)
+    public async Task RemovePhotoAsync(int id, CancellationToken cancellationToken = default)
     {
-        var currentUserId = _currentUserService.GetCurrentUserId();
-        if (currentUserId == null)
-            throw new UnauthorizedAccessException("User not authenticated");
-
-        var photo = await _unitOfWork.PetPhotos.FindAsync(id);
+        var photo = await _petPhotoRepository.FindAsync(id, cancellationToken);
         if (photo == null)
-            throw new ArgumentException($"Photo with id:{id} not found");
+            throw new ArgumentException($"Photo (id:{id}) not found");
 
-        var pet = await _unitOfWork.Pets.FindAsync(photo.PetId);
-        if (pet == null)
-            throw new ArgumentException($"Pet not found for photo {id}");
+        var removedFilePath = Path.Combine(Directory.GetCurrentDirectory(), photo.Path);
+        await Task.Run(() => File.Delete(removedFilePath), cancellationToken);
 
-        if (pet.UserId != currentUserId.Value)
-            throw new UnauthorizedAccessException("You can only delete photos from your own pets");
-
-        await Task.Run(() => File.Delete(photo.Path));
-
-        await _unitOfWork.PetPhotos.RemoveAsync(id);
-        await _unitOfWork.CompleteAsync();
+        await _petPhotoRepository.RemoveAsync(id, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

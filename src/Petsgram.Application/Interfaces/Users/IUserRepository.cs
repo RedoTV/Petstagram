@@ -5,7 +5,7 @@ namespace Petsgram.Application.Interfaces.Users;
 
 public interface IUserRepository : IGenericRepository<User>
 {
-    Task<IEnumerable<User>> GetAllAsync(int count, int skip);
-    Task<User?> GetByUserNameAsync(string userName);
-    Task<bool> UserNameExistsAsync(string userName);
+    Task<List<User>> GetAllAsync(int count, int skip, CancellationToken cancellationToken = default);
+    Task<User?> GetByUserNameAsync(string userName, CancellationToken cancellationToken = default);
+    Task<bool> UserNameExistsAsync(string userName, CancellationToken cancellationToken = default);
 }

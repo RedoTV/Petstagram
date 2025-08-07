@@ -4,11 +4,11 @@ namespace Petsgram.Application.Interfaces.Auth;
 
 public interface IRefreshTokenService
 {
-    Task<Token> RefreshTokenAsync(string refreshToken);
-    Task<bool> ValidateRefreshTokenAsync(string refreshToken);
-    Task<User?> GetUserFromRefreshTokenAsync(string refreshToken);
-    Task StoreRefreshToken(int userId, string refreshToken);
-    Task RevokeTokenAsync(string refreshToken);
-    Task RevokeAllUserTokensAsync(int userId);
-    Task CleanupExpiredTokensAsync();
+    Task<Token> RefreshTokenAsync(string accessToken, string refreshToken, CancellationToken cancellationToken = default);
+    Task<bool> ValidateRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default);
+    Task<User?> GetUserFromRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default);
+    Task StoreRefreshToken(int userId, string refreshToken, CancellationToken cancellationToken = default);
+    Task RevokeTokenAsync(string refreshToken, CancellationToken cancellationToken = default);
+    Task RevokeAllUserTokensAsync(int userId, CancellationToken cancellationToken = default);
+    Task CleanupExpiredTokensAsync(CancellationToken cancellationToken = default);
 }

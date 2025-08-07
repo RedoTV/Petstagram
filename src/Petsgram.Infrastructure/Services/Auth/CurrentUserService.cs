@@ -36,12 +36,12 @@ public class CurrentUserService : ICurrentUserService
         return _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value;
     }
 
-    public async Task<User?> GetCurrentUserAsync()
+    public async Task<User?> GetCurrentUserAsync(CancellationToken cancellationToken = default)
     {
         var userId = GetCurrentUserId();
         if (userId == null)
             return null;
 
-        return await _userRepository.FindAsync(userId.Value);
+        return await _userRepository.FindAsync(userId.Value, cancellationToken);
     }
 }

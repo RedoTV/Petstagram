@@ -4,10 +4,10 @@ namespace Petsgram.Application.Interfaces.Pets;
 
 public interface IPetService
 {
-    Task<IEnumerable<PetResponse>> GetCurrentUserPetsAsync();
-    Task<IEnumerable<PetResponse>> GetUserPetsAsync(int userId);
-    Task<PetResponse> GetPetByIdAsync(int petId);
-    Task AddPetToCurrentUserAsync(CreatePetDto pet);
-    Task UpdatePetAsync(int petId, CreatePetDto pet);
-    Task RemovePetAsync(int petId);
+    Task<List<PetResponse>> GetCurrentUserPetsAsync(CancellationToken cancellationToken = default);
+    Task<List<PetResponse>> GetUserPetsAsync(int userId, CancellationToken cancellationToken = default);
+    Task<PetResponse> GetPetByIdAsync(int petId, CancellationToken cancellationToken = default);
+    Task AddPetToCurrentUserAsync(CreatePetDto dto, CancellationToken cancellationToken = default);
+    Task UpdatePetAsync(int petId, CreatePetDto dto, CancellationToken cancellationToken = default);
+    Task RemovePetAsync(int petId, CancellationToken cancellationToken = default);
 }

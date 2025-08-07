@@ -20,11 +20,11 @@ public class PetsController : ControllerBase
     }
 
     [HttpGet("my-pets")]
-    public async Task<IActionResult> GetCurrentUserPets()
+    public async Task<IActionResult> GetCurrentUserPets(CancellationToken cancellationToken = default)
     {
         try
         {
-            var pets = await _petService.GetCurrentUserPetsAsync();
+            var pets = await _petService.GetCurrentUserPetsAsync(cancellationToken);
             _logger.LogInformation($"Returned {pets.Count()} pets for current user");
             return Ok(pets);
         }
@@ -41,11 +41,11 @@ public class PetsController : ControllerBase
     }
 
     [HttpGet("user/{userId}")]
-    public async Task<IActionResult> GetAllByUser(int userId)
+    public async Task<IActionResult> GetAllByUser(int userId, CancellationToken cancellationToken = default)
     {
         try
         {
-            var pets = await _petService.GetUserPetsAsync(userId);
+            var pets = await _petService.GetUserPetsAsync(userId, cancellationToken);
             _logger.LogInformation($"Returned {pets.Count()} pets for user {userId}");
             return Ok(pets);
         }
@@ -57,11 +57,11 @@ public class PetsController : ControllerBase
     }
 
     [HttpGet("{petId}")]
-    public async Task<IActionResult> GetById(int petId)
+    public async Task<IActionResult> GetById(int petId, CancellationToken cancellationToken = default)
     {
         try
         {
-            var pet = await _petService.GetPetByIdAsync(petId);
+            var pet = await _petService.GetPetByIdAsync(petId, cancellationToken);
             _logger.LogInformation($"Returned pet with id:{petId}");
             return Ok(pet);
         }
@@ -78,11 +78,11 @@ public class PetsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreatePetDto dto)
+    public async Task<IActionResult> Create([FromBody] CreatePetDto dto, CancellationToken cancellationToken = default)
     {
         try
         {
-            await _petService.AddPetToCurrentUserAsync(dto);
+            await _petService.AddPetToCurrentUserAsync(dto, cancellationToken);
             _logger.LogInformation("Pet created for current user");
             return Ok(new { message = "Pet created successfully" });
         }
@@ -99,11 +99,11 @@ public class PetsController : ControllerBase
     }
 
     [HttpPut("{petId}")]
-    public async Task<IActionResult> Update(int petId, [FromBody] CreatePetDto dto)
+    public async Task<IActionResult> Update(int petId, [FromBody] CreatePetDto dto, CancellationToken cancellationToken = default)
     {
         try
         {
-            await _petService.UpdatePetAsync(petId, dto);
+            await _petService.UpdatePetAsync(petId, dto, cancellationToken);
             _logger.LogInformation($"Pet updated: {petId}");
             return Ok(new { message = "Pet updated successfully" });
         }
@@ -125,11 +125,11 @@ public class PetsController : ControllerBase
     }
 
     [HttpDelete("{petId}")]
-    public async Task<IActionResult> Delete(int petId)
+    public async Task<IActionResult> Delete(int petId, CancellationToken cancellationToken = default)
     {
         try
         {
-            await _petService.RemovePetAsync(petId);
+            await _petService.RemovePetAsync(petId, cancellationToken);
             _logger.LogInformation($"Pet deleted: {petId}");
             return Ok(new { message = "Pet deleted successfully" });
         }

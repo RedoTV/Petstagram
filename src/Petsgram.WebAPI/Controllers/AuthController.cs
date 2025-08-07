@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Petsgram.Application.DTOs.Users;
 using Petsgram.Application.Interfaces.Users;
 using Petsgram.Application.Interfaces.Auth;
+using System.Security.Claims;
 
 namespace Petsgram.WebAPI.Controllers;
 
@@ -48,11 +49,11 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("refresh")]
-    public async Task<ActionResult<AuthResponseDto>> RefreshToken([FromBody] RefreshTokenDto refreshTokenDto)
+    public async Task<ActionResult<AuthResponseDto>> RefreshToken([FromBody] RefreshTokenRequestDto refreshTokenRequest)
     {
         try
         {
-            var result = await _userService.RefreshTokenAsync(refreshTokenDto.RefreshToken);
+            var result = await _userService.RefreshTokenAsync(refreshTokenRequest.AccessToken, refreshTokenRequest.RefreshToken);
             return Ok(result);
         }
         catch (InvalidOperationException ex)
@@ -82,13 +83,14 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var currentUser = await _refreshTokenService.GetUserFromRefreshTokenAsync(
-                Request.Headers["Authorization"].ToString().Replace("Bearer ", ""));
-
-            if (currentUser == null)
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
                 return Unauthorized(new { message = "Invalid token" });
 
-            await _refreshTokenService.RevokeAllUserTokensAsync(currentUser.Id);
+            if (!int.TryParse(userIdClaim.Value, out var userId))
+                return Unauthorized(new { message = "Invalid user ID" });
+
+            await _refreshTokenService.RevokeAllUserTokensAsync(userId);
             return Ok(new { message = "All tokens revoked successfully" });
         }
         catch (Exception ex)

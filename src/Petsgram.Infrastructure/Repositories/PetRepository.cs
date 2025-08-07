@@ -1,61 +1,43 @@
-using Microsoft.EntityFrameworkCore;
 using Petsgram.Application.Interfaces.Pets;
 using Petsgram.Domain.Entities;
 using Petsgram.Infrastructure.DbContexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Petsgram.Infrastructure.Repositories;
 
 public class PetRepository : IPetRepository
 {
-    private readonly PetsgramDbContext _dbContext;
+    private readonly PetsgramDbContext _context;
 
-    public PetRepository(PetsgramDbContext dbContext)
+    public PetRepository(PetsgramDbContext context)
     {
-        _dbContext = dbContext;
+        _context = context;
     }
 
-    public async Task<IEnumerable<Pet>> GetAllAsync(int userId)
+    public Task<List<Pet>> GetAllAsync(int userId, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Pets
-            .AsNoTracking()
-            .Include(p => p.PetType)
-            .Include(p => p.Photos)
-            .Where(p => p.UserId == userId)
-            .ToArrayAsync();
+        return _context.Pets.Where(p => p.UserId == userId).ToListAsync(cancellationToken);
     }
 
-    public async Task<Pet?> FindAsync(int petId)
+    public Task<Pet?> FindAsync(int petId, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Pets
-            .AsNoTracking()
-            .Include(p => p.PetType)
-            .Include(p => p.Photos)
-            .FirstOrDefaultAsync(p => p.Id == petId);
+        return _context.Pets.FirstOrDefaultAsync(x => x.Id == petId, cancellationToken);
     }
 
-    public async Task<Pet> AddAsync(Pet pet)
+    public async Task<Pet> AddAsync(Pet pet, CancellationToken cancellationToken = default)
     {
-        await _dbContext.Pets.AddAsync(pet);
+        await _context.Pets.AddAsync(pet, cancellationToken);
         return pet;
     }
 
-    public async Task RemoveAsync(int petId)
+    public Task UpdateAsync(Pet entity, CancellationToken cancellationToken = default)
     {
-        var pet = await FindAsync(petId);
-        if (pet == null)
-            throw new ArgumentException($"Pet with id:{petId} not found");
-
-        _dbContext.Pets.Remove(pet);
+        _context.Pets.Update(entity);
+        return Task.CompletedTask;
     }
 
-    public async Task UpdateAsync(Pet pet)
+    public async Task RemoveAsync(int id, CancellationToken cancellationToken = default)
     {
-        await _dbContext.Pets
-            .Where(p => p.Id == pet.Id)
-            .ExecuteUpdateAsync(setter => setter
-                .SetProperty(p => p.PetName, pet.PetName)
-                .SetProperty(p => p.PetTypeId, pet.PetTypeId)
-                .SetProperty(p => p.UserId, pet.UserId)
-            );
+        await _context.Pets.Where(x => x.Id == id).ExecuteDeleteAsync(cancellationToken);
     }
 }

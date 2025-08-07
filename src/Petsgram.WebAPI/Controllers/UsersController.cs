@@ -1,9 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Petsgram.Application.Interfaces.Users;
-using Petsgram.Application.DTOs.Users;
-using Microsoft.Extensions.Logging;
-using System.Linq;
 
 namespace Petsgram.WebAPI.Controllers;
 
@@ -22,11 +19,11 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] int count = 10, [FromQuery] int skip = 0)
+    public async Task<IActionResult> GetAll([FromQuery] int count = 10, [FromQuery] int skip = 0, CancellationToken cancellationToken = default)
     {
         try
         {
-            var users = await _userService.GetAllAsync(count, skip);
+            var users = await _userService.GetAllAsync(count, skip, cancellationToken);
             _logger.LogInformation($"Returned {users.Count()} users");
             return Ok(users);
         }
@@ -38,11 +35,11 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken = default)
     {
         try
         {
-            var user = await _userService.GetByIdAsync(id);
+            var user = await _userService.GetByIdAsync(id, cancellationToken);
             _logger.LogInformation($"Returned user with id:{id}");
             return Ok(user);
         }
@@ -60,7 +57,7 @@ public class UsersController : ControllerBase
 
     [HttpDelete("{id}")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken = default)
     {
         try
         {
