@@ -1,12 +1,11 @@
-using Petsgram.Application.DTOs.Users;
+using Petsgram.Application.Interfaces.Shared;
 using Petsgram.Domain.Entities;
 
 namespace Petsgram.Application.Interfaces.Users;
 
-public interface IUserRepository
+public interface IUserRepository : IGenericRepository<User>
 {
-    Task<ICollection<User>> GetUsersAsync(int count, int skip);
-    Task<User> GetUserByIdAsyncAsync(int id);
-    Task<ICollection<Pet>> GetPetsByUserIdAsync(int userId);
-    Task AddUserAsync(AddUserDto userRequest);
+    Task<List<User>> GetAllAsync(int count, int skip, CancellationToken cancellationToken = default);
+    Task<User?> GetByUserNameAsync(string userName, CancellationToken cancellationToken = default);
+    Task<bool> UserNameExistsAsync(string userName, CancellationToken cancellationToken = default);
 }

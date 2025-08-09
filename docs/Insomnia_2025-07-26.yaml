@@ -1,0 +1,533 @@
+type: collection.insomnia.rest/5.0
+name: Petsgram
+meta:
+  id: wrk_ac3329d3311346229db40964f19f545e
+  created: 1753539559634
+  modified: 1753539559634
+  description: ""
+collection:
+  - name: Users
+    meta:
+      id: fld_4088c6305e144443a45b41f5b2503508
+      created: 1753539883604
+      modified: 1753539894294
+      sortKey: -1753539883604
+      description: ""
+    children:
+      - url: http://localhost:8080/api/Users
+        name: Add User
+        meta:
+          id: req_987aa3fb0d88426babdd43c14fac9a82
+          created: 1753539913347
+          modified: 1753540126068
+          isPrivate: false
+          description: ""
+          sortKey: -1753539913347
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"userName": "Tom"
+            }
+        headers:
+          - name: accept
+            value: "*/*"
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/api/Users
+        name: Get Users
+        meta:
+          id: req_9aaccf1c74a543fd8afdfb0d53253e37
+          created: 1753539955343
+          modified: 1753540090829
+          isPrivate: false
+          description: ""
+          sortKey: -1753539955343
+        method: GET
+        parameters:
+          - name: count
+            value: "10"
+            disabled: false
+          - name: skip
+            value: "0"
+            disabled: false
+        headers:
+          - name: accept
+            value: "*/*"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/api/Users/1
+        name: Get User
+        meta:
+          id: req_013867f8b29d4e2bb0ffba2a69ed9340
+          created: 1753540003480
+          modified: 1753540080612
+          isPrivate: false
+          description: ""
+          sortKey: -1753540003480
+        method: GET
+        headers:
+          - name: accept
+            value: "*/*"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/api/Users/1
+        name: Edit User
+        meta:
+          id: req_1465427dee8e448d82c89ea58f4ddd94
+          created: 1753540027333
+          modified: 1753540106391
+          isPrivate: false
+          description: ""
+          sortKey: -1753540027333
+        method: PUT
+        body:
+          text: '{   "userName": "Bob" }'
+          mimeType: application/json
+        headers:
+          - name: accept
+            value: "*/*"
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/api/Users/1
+        name: Delete User
+        meta:
+          id: req_613a300acae349df98ac19e5509f8566
+          created: 1753540044432
+          modified: 1753540112932
+          isPrivate: false
+          description: ""
+          sortKey: -1753540044432
+        method: DELETE
+        headers:
+          - name: accept
+            value: "*/*"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Pet Types
+    meta:
+      id: fld_a99b07cfda2f40a38c76b0e027983f07
+      created: 1753540147418
+      modified: 1753540154340
+      sortKey: -1753540147418
+      description: ""
+    children:
+      - url: http://localhost:8080/api/PetTypes
+        name: Add Pet Type
+        meta:
+          id: req_bc4f9350d60b45b3bd6e27b718c4711f
+          created: 1753540176033
+          modified: 1753540401206
+          isPrivate: false
+          description: ""
+          sortKey: -1753540176033
+        method: POST
+        body:
+          text: ""
+          mimeType: ""
+        parameters:
+          - name: name
+            value: dog
+            disabled: false
+        headers:
+          - name: accept
+            value: "*/*"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/api/PetTypes
+        name: Get Pet Types
+        meta:
+          id: req_fac833e4f08a4c41afd4aec67831c451
+          created: 1753540226478
+          modified: 1753540413300
+          isPrivate: false
+          description: ""
+          sortKey: -1753540226478
+        method: GET
+        headers:
+          - name: accept
+            value: "*/*"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/api/PetTypes/1
+        name: Get Pet Type
+        meta:
+          id: req_7dd97fbb68e84f3e86d95919f5967022
+          created: 1753540238182
+          modified: 1753540422777
+          isPrivate: false
+          description: ""
+          sortKey: -1753540238182
+        method: GET
+        headers:
+          - name: accept
+            value: "*/*"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/api/PetTypes/1
+        name: Edit Pet Type
+        meta:
+          id: req_f963f20ad5094a8db0cdabdcd473e103
+          created: 1753540264003
+          modified: 1753540434382
+          isPrivate: false
+          description: ""
+          sortKey: -1753540264003
+        method: PUT
+        parameters:
+          - name: name
+            value: cat
+            disabled: false
+            id: pair_ec3c010ede47416a847b519cf618b8e7
+        headers:
+          - name: accept
+            value: "*/*"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/api/PetTypes/1
+        name: Delete Pet Type
+        meta:
+          id: req_f73150abc7be4172869baaafbf0acbc9
+          created: 1753540354438
+          modified: 1753540441991
+          isPrivate: false
+          description: ""
+          sortKey: -1753540354438
+        method: DELETE
+        parameters:
+          - id: pair_6c8146f6038b4114bef04b511dc0c870
+            name: ""
+            value: ""
+            description: ""
+            disabled: false
+        headers:
+          - name: accept
+            value: "*/*"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Pets
+    meta:
+      id: fld_2c6e5a26083e491fae8a60882914e61e
+      created: 1753540531679
+      modified: 1753540531679
+      sortKey: -1753540531679
+      description: ""
+    children:
+      - url: http://localhost:8080/api/Pets
+        name: Add Pet
+        meta:
+          id: req_20b2cb168c3747b4ae35dc3e92c1d4fd
+          created: 1753540581591
+          modified: 1753540760590
+          isPrivate: false
+          description: ""
+          sortKey: -1753540581591
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {   
+            	"petName": "Bobik",
+            	"petType": "dog" 
+            }
+        parameters:
+          - name: userId
+            value: "1"
+            disabled: false
+            id: pair_c586e8bd62ae406783a68653d6f163d1
+        headers:
+          - name: accept
+            value: "*/*"
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/api/Pets/by-user/1
+        name: Get User Pets
+        meta:
+          id: req_25360a98d9d04898a29a97e2cc2a4509
+          created: 1753540631082
+          modified: 1753540775447
+          isPrivate: false
+          description: ""
+          sortKey: -1753540631082
+        method: GET
+        headers:
+          - name: accept
+            value: "*/*"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/api/Pets/1
+        name: Get Pet
+        meta:
+          id: req_df9a97b34ac8440082d7166c6bc890e3
+          created: 1753540668367
+          modified: 1753540796060
+          isPrivate: false
+          description: ""
+          sortKey: -1753540668367
+        method: GET
+        headers:
+          - name: accept
+            value: "*/*"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/api/Pets/1
+        name: Edit Pet
+        meta:
+          id: req_4212e38a32b14f3b89cf5b4ea772b67c
+          created: 1753540716727
+          modified: 1753540832290
+          isPrivate: false
+          description: ""
+          sortKey: -1753540716727
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {   
+            	"petName": "Sharik",
+            	"petType": "dog" 
+            }
+        headers:
+          - name: accept
+            value: "*/*"
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/api/Pets/1
+        name: Delete Pet
+        meta:
+          id: req_a4106515aa364bba8603b78ef497ccbf
+          created: 1753540740763
+          modified: 1753540838926
+          isPrivate: false
+          description: ""
+          sortKey: -1753540740763
+        method: DELETE
+        headers:
+          - name: accept
+            value: "*/*"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Pet Photos
+    meta:
+      id: fld_ca2537cfa18441498216bf4a262f24f2
+      created: 1753540985761
+      modified: 1753540985761
+      sortKey: -1753540985761
+      description: ""
+    children:
+      - url: http://localhost:8080/api/PetPhotos/upload
+        name: Upload Pet Photo
+        meta:
+          id: req_d24ca8ae5a724946a121494d72d1d400
+          created: 1753540990799
+          modified: 1753541202164
+          isPrivate: false
+          description: ""
+          sortKey: -1753540990799
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - id: pair_4b50405a55ae448da8571b0826215740
+              name: file
+              value: ""
+              description: ""
+              disabled: false
+              type: file
+        parameters:
+          - name: petId
+            value: "1"
+            disabled: false
+            id: pair_e7c806a1ccd74b6385c0500d1d45a8eb
+          - name: userId
+            value: "1"
+            disabled: false
+            id: pair_d473e9d600ab45119fa0186b667bd430
+        headers:
+          - name: accept
+            value: "*/*"
+          - name: Content-Type
+            value: multipart/form-data
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/api/PetPhotos/1
+        name: Get Pet Photo
+        meta:
+          id: req_6bc6bb1c9bfd44a0bbeb2ca0eeb91d8d
+          created: 1753541079278
+          modified: 1753541212612
+          isPrivate: false
+          description: ""
+          sortKey: -1753541079278
+        method: GET
+        headers:
+          - name: accept
+            value: "*/*"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/api/PetPhotos/by-pet/1
+        name: Get All Pet Photos
+        meta:
+          id: req_47bad8dc2d1540d5a1ced344ad8abd56
+          created: 1753541100133
+          modified: 1753541155117
+          isPrivate: false
+          description: ""
+          sortKey: -1753541100133
+        method: GET
+        headers:
+          - name: accept
+            value: "*/*"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/api/PetPhotos/1
+        name: Delete Pet Photo
+        meta:
+          id: req_590a9e73744a4ace9f1f218a82f80c1a
+          created: 1753541121026
+          modified: 1753541144848
+          isPrivate: false
+          description: ""
+          sortKey: -1753541121026
+        method: DELETE
+        headers:
+          - name: accept
+            value: "*/*"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_fef788c7a8294e79862203237c714debdc0f1a95
+    created: 1753539559640
+    modified: 1753539559640
+environments:
+  name: Base Environment
+  meta:
+    id: env_fef788c7a8294e79862203237c714debdc0f1a95
+    created: 1753539559638
+    modified: 1753539559638
+    isPrivate: false

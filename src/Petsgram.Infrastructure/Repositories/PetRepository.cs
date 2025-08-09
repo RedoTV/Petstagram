@@ -1,44 +1,43 @@
 using Petsgram.Application.Interfaces.Pets;
 using Petsgram.Domain.Entities;
 using Petsgram.Infrastructure.DbContexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Petsgram.Infrastructure.Repositories;
 
 public class PetRepository : IPetRepository
 {
-    private readonly PetsgramDbContext _dbContext;
+    private readonly PetsgramDbContext _context;
 
-    public PetRepository(PetsgramDbContext dbContext)
+    public PetRepository(PetsgramDbContext context)
     {
-        _dbContext = dbContext;
+        _context = context;
     }
 
-    public async Task<ICollection<Pet>> GetAsync(int userId)
+    public Task<List<Pet>> GetAllAsync(int userId, CancellationToken cancellationToken = default)
     {
-        User? user = await _dbContext.Users.FindAsync(userId);
-
-        if (user is null || user.Pets is null)
-            return [];
-
-        return user.Pets;
+        return _context.Pets.Where(p => p.UserId == userId).ToListAsync(cancellationToken);
     }
 
-    public async Task<Pet> AddAsync(Pet pet)
+    public Task<Pet?> FindAsync(int petId, CancellationToken cancellationToken = default)
     {
-        await _dbContext.Pets.AddAsync(pet);
-        await _dbContext.SaveChangesAsync();
+        return _context.Pets.FirstOrDefaultAsync(x => x.Id == petId, cancellationToken);
+    }
 
+    public async Task<Pet> AddAsync(Pet pet, CancellationToken cancellationToken = default)
+    {
+        await _context.Pets.AddAsync(pet, cancellationToken);
         return pet;
     }
 
-    public async Task RemoveAsync(int petId)
+    public Task UpdateAsync(Pet entity, CancellationToken cancellationToken = default)
     {
-        Pet? pet = await _dbContext.Pets.FindAsync(petId);
+        _context.Pets.Update(entity);
+        return Task.CompletedTask;
+    }
 
-        if (pet is not null)
-        {
-            _dbContext.Pets.Remove(pet);
-            await _dbContext.SaveChangesAsync();
-        }
+    public async Task RemoveAsync(int id, CancellationToken cancellationToken = default)
+    {
+        await _context.Pets.Where(x => x.Id == id).ExecuteDeleteAsync(cancellationToken);
     }
 }
