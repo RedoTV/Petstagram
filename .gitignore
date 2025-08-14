@@ -1,4 +1,6 @@
 pet_photos/
+.idea/
+.vscode/
 
 # User-specific files
 *.rsuser
