@@ -9,5 +9,9 @@ public class PetTypeProfile : Profile
     public PetTypeProfile()
     {
         CreateMap<PetType, PetTypeResponse>();
+
+        CreateMap<PetTypeCreateRequest, PetType>();
+
+        CreateMap<PetTypeUpdateRequest, PetType>();
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Petsgram.Application.DTOs.PetTypes;
 using Petsgram.Application.Interfaces.PetTypes;
 
 namespace Petsgram.WebAPI.Controllers;
@@ -18,80 +19,35 @@ public class PetTypesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var types = await _petTypeService.GetAllAsync(cancellationToken);
-            _logger.LogInformation($"Returned {types.Count()} pet types");
-            return Ok(types);
-        }
-        catch (Exception exc)
-        {
-            _logger.LogError($"Error getting pet types: {exc}");
-            return BadRequest(new { message = "Error getting pet types" });
-        }
+        var types = await _petTypeService.GetAllAsync(cancellationToken);
+        return Ok(types);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var type = await _petTypeService.GetByIdAsync(id, cancellationToken);
-            _logger.LogInformation($"Returned pet type with id:{id}");
-            return Ok(type);
-        }
-        catch (Exception exc)
-        {
-            _logger.LogError($"Pet type not found with id:{id}, error:{exc}");
-            return BadRequest(new { message = "Pet type not found" });
-        }
+        var type = await _petTypeService.GetByIdAsync(id, cancellationToken);
+        return Ok(type);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromQuery] string name, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Create([FromBody] PetTypeCreateRequest request, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _petTypeService.AddTypeAsync(name, cancellationToken);
-            _logger.LogInformation($"Pet type created: {name}");
-            return Ok();
-        }
-        catch (Exception exc)
-        {
-            _logger.LogError($"Pet type not created, error:{exc}");
-            return BadRequest(new { message = "Pet type not created" });
-        }
+        var created = await _petTypeService.AddTypeAsync(request, cancellationToken);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromQuery] string name, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Update(int id, [FromBody] PetTypeUpdateRequest request, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _petTypeService.UpdateTypeAsync(id, name, cancellationToken);
-            _logger.LogInformation($"Pet type updated: {id}");
-            return Ok();
-        }
-        catch (Exception exc)
-        {
-            _logger.LogError($"Pet type not updated: {id}, error:{exc}");
-            return BadRequest(new { message = "Pet type not updated" });
-        }
+        var updated = await _petTypeService.UpdateTypeAsync(id, request, cancellationToken);
+        return Ok(updated);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _petTypeService.RemoveTypeAsync(id, cancellationToken);
-            _logger.LogInformation($"Pet type deleted: {id}");
-            return Ok();
-        }
-        catch (Exception exc)
-        {
-            _logger.LogError($"Pet type not deleted: {id}, error:{exc}");
-            return BadRequest(new { message = "Pet type not deleted" });
-        }
+        var deleted = await _petTypeService.RemoveTypeAsync(id, cancellationToken);
+        return Ok(deleted);
     }
 }

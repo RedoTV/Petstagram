@@ -44,8 +44,6 @@ public class RefreshTokenService : IRefreshTokenService
             throw new SecurityTokenException("Invalid refresh token: token not found");
         }
 
-
-
         if (storedToken.UserId != user.Id)
         {
 
@@ -63,8 +61,6 @@ public class RefreshTokenService : IRefreshTokenService
 
             throw new SecurityTokenException("Invalid refresh token: revoked");
         }
-
-
 
         var newJwtToken = GenerateJwtToken(user);
         var newRefreshToken = GenerateRefreshToken();
@@ -149,7 +145,7 @@ public class RefreshTokenService : IRefreshTokenService
         );
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-
+    
     private ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
     {
         var tokenValidationParameters = new TokenValidationParameters

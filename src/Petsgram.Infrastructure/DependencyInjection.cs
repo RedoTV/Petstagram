@@ -9,6 +9,7 @@ using Petsgram.Infrastructure.Repositories;
 using Petsgram.Infrastructure.Services.Auth;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Petsgram.Infrastructure.ExceptionHandlers;
 using UnitOfWorkImpl = Petsgram.Infrastructure.UnitOfWork.UnitOfWork;
 
 namespace Petsgram.Infrastructure;
@@ -19,6 +20,10 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.AddExceptionHandler<PetTypeExceptionHandler>();
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddProblemDetails();
+    
         services.AddSqlServer<PetsgramDbContext>(configuration.GetConnectionString("DbConnection"),
             b => b.MigrationsAssembly("Petsgram.Infrastructure"));
 
