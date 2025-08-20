@@ -1,4 +1,3 @@
-using Petsgram.Application.DTOs.Pets;
 using Petsgram.Application.DTOs.Users;
 using AutoMapper;
 using Petsgram.Domain.Entities;
@@ -9,7 +8,10 @@ public class UserProfile : Profile
 {
     public UserProfile()
     {
-        CreateMap<CreateUserDto, User>();
         CreateMap<User, UserResponse>();
+        
+        CreateMap<CreateUserRequest, User>();
+        
+        CreateMap<RefreshToken, RefreshTokenResponse>();
     }
 }

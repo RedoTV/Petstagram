@@ -10,143 +10,52 @@ namespace Petsgram.WebApi.Controllers;
 [Authorize]
 public class PetsController : ControllerBase
 {
-    private readonly ILogger<PetsController> _logger;
     private readonly IPetService _petService;
 
-    public PetsController(ILogger<PetsController> logger, IPetService petService)
+    public PetsController(IPetService petService)
     {
-        _logger = logger;
         _petService = petService;
     }
 
     [HttpGet("my-pets")]
     public async Task<IActionResult> GetCurrentUserPets(CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var pets = await _petService.GetCurrentUserPetsAsync(cancellationToken);
-            _logger.LogInformation($"Returned {pets.Count()} pets for current user");
-            return Ok(pets);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            _logger.LogError($"Unauthorized access: {ex.Message}");
-            return Unauthorized(new { message = ex.Message });
-        }
-        catch (Exception exc)
-        {
-            _logger.LogError($"Error getting current user pets: {exc}");
-            return BadRequest(new { message = "Error getting pets" });
-        }
+        var pets = await _petService.GetCurrentUserPetsAsync(cancellationToken);
+        return Ok(pets);
     }
 
     [HttpGet("user/{userId}")]
     public async Task<IActionResult> GetAllByUser(int userId, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var pets = await _petService.GetUserPetsAsync(userId, cancellationToken);
-            _logger.LogInformation($"Returned {pets.Count()} pets for user {userId}");
-            return Ok(pets);
-        }
-        catch (Exception exc)
-        {
-            _logger.LogError($"Error getting pets for user {userId}: {exc}");
-            return BadRequest(new { message = "Error getting pets" });
-        }
+        var pets = await _petService.GetUserPetsAsync(userId, cancellationToken);
+        return Ok(pets);
     }
 
     [HttpGet("{petId}")]
     public async Task<IActionResult> GetById(int petId, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var pet = await _petService.GetPetByIdAsync(petId, cancellationToken);
-            _logger.LogInformation($"Returned pet with id:{petId}");
-            return Ok(pet);
-        }
-        catch (ArgumentException ex)
-        {
-            _logger.LogError($"Pet not found with id:{petId}, error:{ex}");
-            return NotFound(new { message = ex.Message });
-        }
-        catch (Exception exc)
-        {
-            _logger.LogError($"Error getting pet with id:{petId}, error:{exc}");
-            return BadRequest(new { message = "Error getting pet" });
-        }
+        var pet = await _petService.GetPetByIdAsync(petId, cancellationToken);
+        return Ok(pet);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreatePetDto dto, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Create([FromBody] CreatePetRequest request, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            await _petService.AddPetToCurrentUserAsync(dto, cancellationToken);
-            _logger.LogInformation("Pet created for current user");
-            return Ok(new { message = "Pet created successfully" });
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            _logger.LogError($"Unauthorized access: {ex.Message}");
-            return Unauthorized(new { message = ex.Message });
-        }
-        catch (Exception exc)
-        {
-            _logger.LogError($"Pet not created, error:{exc}");
-            return BadRequest(new { message = "Pet not created" });
-        }
+        var created = await _petService.AddPetToCurrentUserAsync(request, cancellationToken);
+        return CreatedAtAction(nameof(GetById), new { petId = created.Id }, created);
     }
 
     [HttpPut("{petId}")]
-    public async Task<IActionResult> Update(int petId, [FromBody] CreatePetDto dto, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Update(int petId, [FromBody] UpdatePetRequest request, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            await _petService.UpdatePetAsync(petId, dto, cancellationToken);
-            _logger.LogInformation($"Pet updated: {petId}");
-            return Ok(new { message = "Pet updated successfully" });
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            _logger.LogError($"Unauthorized access: {ex.Message}");
-            return Unauthorized(new { message = ex.Message });
-        }
-        catch (ArgumentException ex)
-        {
-            _logger.LogError($"Pet not found with id:{petId}, error:{ex}");
-            return NotFound(new { message = ex.Message });
-        }
-        catch (Exception exc)
-        {
-            _logger.LogError($"Pet not updated: {petId}, error:{exc}");
-            return BadRequest(new { message = "Pet not updated" });
-        }
+        var updated = await _petService.UpdatePetAsync(petId, request, cancellationToken);
+        return Ok(updated);
     }
 
     [HttpDelete("{petId}")]
     public async Task<IActionResult> Delete(int petId, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            await _petService.RemovePetAsync(petId, cancellationToken);
-            _logger.LogInformation($"Pet deleted: {petId}");
-            return Ok(new { message = "Pet deleted successfully" });
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            _logger.LogError($"Unauthorized access: {ex.Message}");
-            return Unauthorized(new { message = ex.Message });
-        }
-        catch (ArgumentException ex)
-        {
-            _logger.LogError($"Pet not found with id:{petId}, error:{ex}");
-            return NotFound(new { message = ex.Message });
-        }
-        catch (Exception exc)
-        {
-            _logger.LogError($"Pet not deleted: {petId}, error:{exc}");
-            return BadRequest(new { message = "Pet not deleted" });
-        }
+        var deleted = await _petService.RemovePetAsync(petId, cancellationToken);
+        return Ok(deleted);
     }
 }

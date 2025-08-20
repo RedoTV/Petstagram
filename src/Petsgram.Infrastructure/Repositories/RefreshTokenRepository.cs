@@ -16,7 +16,9 @@ public class RefreshTokenRepository : IRefreshTokenRepository
 
     public Task<RefreshToken?> FindAsync(int id, CancellationToken cancellationToken = default)
     {
-        return _context.RefreshTokens.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        return _context.RefreshTokens
+            .Include(rt => rt.User)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
     public async Task<RefreshToken> AddAsync(RefreshToken entity, CancellationToken cancellationToken = default)
@@ -27,7 +29,6 @@ public class RefreshTokenRepository : IRefreshTokenRepository
         var result = await _context.RefreshTokens.AddAsync(entity, cancellationToken);
         return result.Entity;
     }
-
 
     public Task UpdateAsync(RefreshToken entity, CancellationToken cancellationToken = default)
     {
@@ -42,12 +43,17 @@ public class RefreshTokenRepository : IRefreshTokenRepository
 
     public Task<RefreshToken?> GetByTokenAsync(string token, CancellationToken cancellationToken = default)
     {
-        return _context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == token, cancellationToken);
+        return _context.RefreshTokens
+            .Include(rt => rt.User)
+            .FirstOrDefaultAsync(rt => rt.Token == token, cancellationToken);
     }
 
     public Task<List<RefreshToken>> GetByUserIdAsync(int userId, CancellationToken cancellationToken = default)
     {
-        return _context.RefreshTokens.Where(rt => rt.UserId == userId).ToListAsync(cancellationToken);
+        return _context.RefreshTokens
+            .Include(rt => rt.User)
+            .Where(rt => rt.UserId == userId)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task RevokeTokenAsync(string token, CancellationToken cancellationToken = default)

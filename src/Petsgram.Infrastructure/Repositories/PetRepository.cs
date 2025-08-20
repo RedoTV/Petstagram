@@ -16,12 +16,19 @@ public class PetRepository : IPetRepository
 
     public Task<List<Pet>> GetAllAsync(int userId, CancellationToken cancellationToken = default)
     {
-        return _context.Pets.Where(p => p.UserId == userId).ToListAsync(cancellationToken);
+        return _context.Pets
+            .Include(p => p.PetType)
+            .Include(p => p.Photos)
+            .Where(p => p.UserId == userId)
+            .ToListAsync(cancellationToken);
     }
 
     public Task<Pet?> FindAsync(int petId, CancellationToken cancellationToken = default)
     {
-        return _context.Pets.FirstOrDefaultAsync(x => x.Id == petId, cancellationToken);
+        return _context.Pets
+            .Include(p => p.PetType)
+            .Include(p => p.Photos)
+            .FirstOrDefaultAsync(x => x.Id == petId, cancellationToken);
     }
 
     public async Task<Pet> AddAsync(Pet pet, CancellationToken cancellationToken = default)

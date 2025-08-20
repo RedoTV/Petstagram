@@ -21,81 +21,43 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult<AuthResponseDto>> Register([FromBody] CreateUserDto userDto)
+    public async Task<IActionResult> Register([FromBody] CreateUserRequest request, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var result = await _userService.RegisterAsync(userDto);
-            return Ok(result);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
+        var result = await _userService.RegisterAsync(request, cancellationToken);
+        return Ok(result);
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<AuthResponseDto>> Login([FromBody] LoginDto loginDto)
+    public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var result = await _userService.LoginAsync(loginDto);
-            return Ok(result);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
+        var result = await _userService.LoginAsync(request, cancellationToken);
+        return Ok(result);
     }
 
     [HttpPost("refresh")]
-    public async Task<ActionResult<AuthResponseDto>> RefreshToken([FromBody] RefreshTokenRequestDto refreshTokenRequest)
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var result = await _userService.RefreshTokenAsync(refreshTokenRequest.AccessToken, refreshTokenRequest.RefreshToken);
-            return Ok(result);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
+        var result = await _userService.RefreshTokenAsync(request.AccessToken, request.RefreshToken, cancellationToken);
+        return Ok(result);
     }
 
     [HttpPost("revoke")]
     [Authorize]
-    public async Task<ActionResult> RevokeToken([FromBody] RefreshTokenDto refreshTokenDto)
+    public async Task<IActionResult> RevokeToken([FromBody] RevokeTokenRequest request, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            await _refreshTokenService.RevokeTokenAsync(refreshTokenDto.RefreshToken);
-            return Ok(new { message = "Token revoked successfully" });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
+        var revoked = await _refreshTokenService.RevokeTokenAsync(request.RefreshToken, cancellationToken);
+        return Ok(revoked);
     }
 
     [HttpPost("revoke-all")]
     [Authorize]
-    public async Task<ActionResult> RevokeAllTokens()
+    public async Task<IActionResult> RevokeAllTokens(CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
-                return Unauthorized(new { message = "Invalid token" });
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+            throw new UnauthorizedAccessException("Invalid token");
 
-            if (!int.TryParse(userIdClaim.Value, out var userId))
-                return Unauthorized(new { message = "Invalid user ID" });
-
-            await _refreshTokenService.RevokeAllUserTokensAsync(userId);
-            return Ok(new { message = "All tokens revoked successfully" });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
+        var revoked = await _refreshTokenService.RevokeAllUserTokensAsync(userId, cancellationToken);
+        return Ok(revoked);
     }
 }

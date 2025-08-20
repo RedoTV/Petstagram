@@ -16,12 +16,24 @@ public class UserRepository : IUserRepository
 
     public Task<List<User>> GetAllAsync(int count, int skip, CancellationToken cancellationToken = default)
     {
-        return _context.Users.Skip(skip).Take(count).ToListAsync(cancellationToken);
+        return _context.Users
+            .Include(u => u.Pets)
+                .ThenInclude(p => p.PetType)
+            .Include(u => u.Pets)
+                .ThenInclude(p => p.Photos)
+            .Skip(skip)
+            .Take(count)
+            .ToListAsync(cancellationToken);
     }
 
     public Task<User?> FindAsync(int id, CancellationToken cancellationToken = default)
     {
-        return _context.Users.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        return _context.Users
+            .Include(u => u.Pets)
+                .ThenInclude(p => p.PetType)
+            .Include(u => u.Pets)
+                .ThenInclude(p => p.Photos)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
     public async Task<User> AddAsync(User entity, CancellationToken cancellationToken = default)

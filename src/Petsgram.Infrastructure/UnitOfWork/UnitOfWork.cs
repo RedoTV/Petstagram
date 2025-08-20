@@ -3,12 +3,12 @@ using Petsgram.Infrastructure.DbContexts;
 
 namespace Petsgram.Infrastructure.UnitOfWork;
 
-public class UnitOfWork : IUnitOfWork
+public class UnitOfWorkImplementation : IUnitOfWork
 {
     private readonly PetsgramDbContext _context;
     private bool _disposed;
 
-    public UnitOfWork(PetsgramDbContext context)
+    public UnitOfWorkImplementation(PetsgramDbContext context)
     {
         _context = context;
     }

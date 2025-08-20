@@ -8,11 +8,9 @@ namespace Petsgram.WebAPI.Controllers;
 [Route("api/[controller]")]
 public class PetTypesController : ControllerBase
 {
-    private readonly ILogger<PetTypesController> _logger;
     private readonly IPetTypeService _petTypeService;
-    public PetTypesController(ILogger<PetTypesController> logger, IPetTypeService petTypeService)
+    public PetTypesController(IPetTypeService petTypeService)
     {
-        _logger = logger;
         _petTypeService = petTypeService;
     }
 

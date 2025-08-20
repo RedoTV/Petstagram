@@ -7,7 +7,7 @@ public interface IPetService
     Task<List<PetResponse>> GetCurrentUserPetsAsync(CancellationToken cancellationToken = default);
     Task<List<PetResponse>> GetUserPetsAsync(int userId, CancellationToken cancellationToken = default);
     Task<PetResponse> GetPetByIdAsync(int petId, CancellationToken cancellationToken = default);
-    Task AddPetToCurrentUserAsync(CreatePetDto dto, CancellationToken cancellationToken = default);
-    Task UpdatePetAsync(int petId, CreatePetDto dto, CancellationToken cancellationToken = default);
-    Task RemovePetAsync(int petId, CancellationToken cancellationToken = default);
+    Task<PetResponse> AddPetToCurrentUserAsync(CreatePetRequest request, CancellationToken cancellationToken = default);
+    Task<PetResponse> UpdatePetAsync(int petId, UpdatePetRequest request, CancellationToken cancellationToken = default);
+    Task<PetResponse> RemovePetAsync(int petId, CancellationToken cancellationToken = default);
 }

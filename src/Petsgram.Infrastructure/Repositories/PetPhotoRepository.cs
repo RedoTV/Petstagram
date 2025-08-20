@@ -16,12 +16,19 @@ public class PetPhotoRepository : IPetPhotoRepository
 
     public Task<List<PetPhoto>> GetAllAsync(int petId, CancellationToken cancellationToken = default)
     {
-        return _context.PetPhotos.Where(pp => pp.PetId == petId).ToListAsync(cancellationToken);
+        return _context.PetPhotos
+            .Include(pp => pp.Pet)
+            .ThenInclude(p => p.PetType)
+            .Where(pp => pp.PetId == petId)
+            .ToListAsync(cancellationToken);
     }
 
     public Task<PetPhoto?> FindAsync(int id, CancellationToken cancellationToken = default)
     {
-        return _context.PetPhotos.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        return _context.PetPhotos
+            .Include(pp => pp.Pet)
+            .ThenInclude(p => p.PetType)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
     public async Task<PetPhoto> AddAsync(PetPhoto entity, CancellationToken cancellationToken = default)
