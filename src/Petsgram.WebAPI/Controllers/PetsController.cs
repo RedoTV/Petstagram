@@ -1,64 +1,69 @@
 using Petsgram.Application.DTOs.Pets;
 using Petsgram.Application.Interfaces.Pets;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Petsgram.WebApi.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
+[Authorize]
 public class PetsController : ControllerBase
 {
-    private readonly ILogger<PetsController> _logger;
     private readonly IPetService _petService;
 
-    public PetsController(ILogger<PetsController> logger, IPetService petService)
+    public PetsController(IPetService petService)
     {
-        _logger = logger;
         _petService = petService;
     }
 
-    [HttpGet("getPets/{userId}")]
-    public async Task<IActionResult> GetPets(int userId)
+    [HttpGet("my-pets")]
+    public async Task<IActionResult> GetCurrentUserPets(
+        [FromQuery] string? currency = null,
+        CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var pets = await _petService.GetUserPetsAsync(userId);
-            return Ok(new { pets });
-        }
-        catch (Exception exc)
-        {
-            _logger.LogInformation($"Pets not found for user with id:{userId}, \nerror:{exc}");
-            return BadRequest(new { message = "Pets not found" });
-        }
+        var pets = await _petService.GetCurrentUserPetsAsync(currency, cancellationToken);
+        return Ok(pets);
     }
 
-    [HttpPost("addPet/{userId}")]
-    public async Task<IActionResult> AddPet(int userId, AddPetToUserAsyncDto pet)
+    [HttpGet("user/{userId}")]
+    public async Task<IActionResult> GetAllByUser(
+        int userId, 
+        [FromQuery] string? currency = null,
+        CancellationToken cancellationToken = default)
     {
-        try
-        {
-            await _petService.AddPetToUserAsync(userId, pet);
-            return Ok(new { message = "Pet added" });
-        }
-        catch (Exception exc)
-        {
-            _logger.LogError($"Pet not added for user with id:{userId}, \nerror:{exc}");
-            return BadRequest(new { message = "Pet not added" });
-        }
+        var pets = await _petService.GetUserPetsAsync(userId, currency, cancellationToken);
+        return Ok(pets);
     }
 
-    [HttpDelete("removePet/{petId}")]
-    public async Task<IActionResult> RemovePet(int petId)
+    [HttpGet("{petId}")]
+    public async Task<IActionResult> GetById(
+        int petId, 
+        [FromQuery] string? currency = null,
+        CancellationToken cancellationToken = default)
     {
-        try
-        {
-            await _petService.RemoveUserPetAsync(petId);
-            return Ok(new { message = "Pet with id removed" });
-        }
-        catch (Exception exc)
-        {
-            _logger.LogError($"Pet not removed \nerror:{exc}");
-            return BadRequest(new { message = "Pet not removed" });
-        }
+        var pet = await _petService.GetPetByIdAsync(petId, currency, cancellationToken);
+        return Ok(pet);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] CreatePetRequest request, CancellationToken cancellationToken = default)
+    {
+        var created = await _petService.AddPetToCurrentUserAsync(request, cancellationToken);
+        return CreatedAtAction(nameof(GetById), new { petId = created.Id }, created);
+    }
+
+    [HttpPut("{petId}")]
+    public async Task<IActionResult> Update(int petId, [FromBody] UpdatePetRequest request, CancellationToken cancellationToken = default)
+    {
+        var updated = await _petService.UpdatePetAsync(petId, request, cancellationToken);
+        return Ok(updated);
+    }
+
+    [HttpDelete("{petId}")]
+    public async Task<IActionResult> Delete(int petId, CancellationToken cancellationToken = default)
+    {
+        var deleted = await _petService.RemovePetAsync(petId, cancellationToken);
+        return Ok(deleted);
     }
 }

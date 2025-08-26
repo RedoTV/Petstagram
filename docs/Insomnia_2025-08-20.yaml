@@ -1,0 +1,830 @@
+type: collection.insomnia.rest/5.0
+name: Petsgram
+meta:
+  id: wrk_09abe45e74b3484ca0abe03ca01c4a67
+  created: 1754345831421
+  modified: 1754345831421
+  description: ""
+collection:
+  - name: Users
+    meta:
+      id: fld_cafa53b18588442ea7cc00b99b59ddc5
+      created: 1753539883604
+      modified: 1754594133041
+      sortKey: -1753539883604
+      description: ""
+    children:
+      - url: "{{apiUrl}}/Users?count=10&skip=0"
+        name: Get All Users
+        meta:
+          id: req_28e315ac572c4d90a88c25cc4375e6a4
+          created: 1753539955343
+          modified: 1755715341683
+          isPrivate: false
+          description: ""
+          sortKey: -1753539955343
+        method: GET
+        parameters:
+          - name: count
+            value: "10"
+            disabled: false
+          - name: skip
+            value: "0"
+            disabled: false
+        headers:
+          - name: accept
+            value: "*/*"
+            id: pair_a54d88e7ef50425ca51a6434030d8864
+          - id: pair_cc51a16072da4e2bb9413cf51b487ae7
+            name: Authorization
+            value: Bearer {{accessToken}}
+            description: ""
+            disabled: false
+        scripts:
+          preRequest: ""
+          afterResponse: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{apiUrl}}/Users/{{currentUserId}}"
+        name: Get User
+        meta:
+          id: req_7af805b3584d4e909a2ceb909270101c
+          created: 1753540003480
+          modified: 1755715335051
+          isPrivate: false
+          description: ""
+          sortKey: -1753540003480
+        method: GET
+        headers:
+          - name: accept
+            value: "*/*"
+            id: pair_ff47ccf4ce07439793fe228b37e64096
+          - id: pair_44e2eb2b2c454e6ba78cccb552f2ea4a
+            name: Authorization
+            value: Bearer {{accessToken}}
+            description: ""
+            disabled: false
+        scripts:
+          preRequest: ""
+          afterResponse: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{apiUrl}}/Users/{{currentUserId}}"
+        name: Delete User
+        meta:
+          id: req_634f9ac000dc455d95f37c7c79fcd3c3
+          created: 1753540044432
+          modified: 1754595516128
+          isPrivate: false
+          description: "Delete User (Admin only) "
+          sortKey: -1753540044432
+        method: DELETE
+        headers:
+          - name: accept
+            value: "*/*"
+            id: pair_bb09ec5ecd32460a909d513ab8280bdc
+          - id: pair_be1dac0b784c4aab809600e5fea88564
+            name: Authorization
+            value: Bearer {{accessToken}}
+            description: ""
+            disabled: false
+        scripts:
+          preRequest: ""
+          afterResponse: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+    scripts:
+      afterResponse: ""
+      preRequest: ""
+  - name: Pet Types
+    meta:
+      id: fld_d3f910a069fd45e1b8641976bceb3a13
+      created: 1753540147418
+      modified: 1753540154340
+      sortKey: -1753540147418
+      description: ""
+    children:
+      - url: "{{apiUrl}}/PetTypes"
+        name: Create Pet Type
+        meta:
+          id: req_b1bc2d636d494e4fa1c74999a104d519
+          created: 1753540176033
+          modified: 1754595636285
+          isPrivate: false
+          description: ""
+          sortKey: -1753540176033
+        method: POST
+        body:
+          mimeType: ""
+          text: ""
+        parameters:
+          - name: name
+            value: dog
+            disabled: false
+        headers:
+          - name: accept
+            value: "*/*"
+        scripts:
+          preRequest: ""
+          afterResponse: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{apiUrl}}/PetTypes"
+        name: Get Pet Types
+        meta:
+          id: req_a54a8dba5b8e4cb59028262af17b448e
+          created: 1753540226478
+          modified: 1755721381470
+          isPrivate: false
+          description: ""
+          sortKey: -1753540226478
+        method: GET
+        headers:
+          - name: accept
+            value: "*/*"
+        scripts:
+          preRequest: ""
+          afterResponse: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{apiUrl}}/PetTypes/{{ _.testPetTypeId }}"
+        name: Get Pet Type
+        meta:
+          id: req_7d0f258ec6f54be8b829d81a23abccbf
+          created: 1753540238182
+          modified: 1755721379258
+          isPrivate: false
+          description: ""
+          sortKey: -1753540238182
+        method: GET
+        headers:
+          - name: accept
+            value: "*/*"
+        scripts:
+          preRequest: ""
+          afterResponse: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{apiUrl}}/PetTypes/{{testPetTypeId}}"
+        name: Edit Pet Type
+        meta:
+          id: req_de1d83fe45b94899a8af45a19993c416
+          created: 1753540264003
+          modified: 1755721393766
+          isPrivate: false
+          description: ""
+          sortKey: -1753540264003
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "dog"
+            }
+        parameters:
+          - name: name
+            value: updated dog
+            disabled: false
+            id: pair_ec3c010ede47416a847b519cf618b8e7
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: accept
+            value: "*/*"
+        scripts:
+          preRequest: ""
+          afterResponse: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{apiUrl}}/PetTypes/{{testPetTypeId}}"
+        name: Delete Pet Type
+        meta:
+          id: req_a422a0f480f5489ab1ba618506167d08
+          created: 1753540354438
+          modified: 1754595763178
+          isPrivate: false
+          description: ""
+          sortKey: -1753540354438
+        method: DELETE
+        parameters:
+          - name: ""
+            value: ""
+            disabled: false
+            id: pair_6c8146f6038b4114bef04b511dc0c870
+        headers:
+          - name: accept
+            value: "*/*"
+        scripts:
+          preRequest: ""
+          afterResponse: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+    scripts:
+      afterResponse: ""
+      preRequest: ""
+  - name: Pets
+    meta:
+      id: fld_b73338881e5b420c882cc016f7f822cc
+      created: 1753540531679
+      modified: 1753540531679
+      sortKey: -1753540531679
+      description: ""
+    children:
+      - url: "{{apiUrl}}/Pets"
+        name: Create Pet
+        meta:
+          id: req_fccdd9ffa229446296fd61c16afc7225
+          created: 1753540581591
+          modified: 1754597285314
+          isPrivate: false
+          description: ""
+          sortKey: -1753540581591
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {   
+            	"petName": "Bobik",
+            	"petType": "dog" 
+            }
+        parameters:
+          - name: userId
+            value: "1"
+            disabled: false
+            id: pair_c586e8bd62ae406783a68653d6f163d1
+        headers:
+          - name: accept
+            value: "*/*"
+            id: pair_7256769591124c47bac55beb90c1d200
+          - name: Content-Type
+            value: application/json
+            id: pair_3de648dad4b148e28d5500fe0086b527
+          - id: pair_cebb1ce41cdb4b10ab209d75a8a4d86b
+            name: Authorization
+            value: Bearer {{accessToken}}
+            description: ""
+            disabled: false
+        scripts:
+          preRequest: ""
+          afterResponse: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{apiUrl}}/Pets/my-pets"
+        name: Get User Pets
+        meta:
+          id: req_a69f51d1da534538848a0fa736d600fb
+          created: 1753540631082
+          modified: 1754595862548
+          isPrivate: false
+          description: ""
+          sortKey: -1753540631082
+        method: GET
+        headers:
+          - name: accept
+            value: "*/*"
+            id: pair_4024e6802fcf4826ae7ea18c2c74c479
+          - id: pair_232f240a80a54552b7bb18ccf1a9d852
+            name: Authorization
+            value: Bearer {{accessToken}}
+            description: ""
+            disabled: false
+        scripts:
+          preRequest: ""
+          afterResponse: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{apiUrl}}/Pets/{{testPetId}}"
+        name: Get Pet
+        meta:
+          id: req_943c1ae8a0ca4140a08e8c25c4d02ef6
+          created: 1753540668367
+          modified: 1754597246235
+          isPrivate: false
+          description: ""
+          sortKey: -1753540668367
+        method: GET
+        headers:
+          - name: accept
+            value: "*/*"
+            id: pair_11d6b3f2453142f9ae32d4905cfc53cd
+          - id: pair_0fd80acf1fc54a9889d76b93e615be28
+            name: Authorization
+            value: Bearer {{accessToken}}
+            description: ""
+            disabled: false
+        scripts:
+          preRequest: ""
+          afterResponse: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{apiUrl}}/Pets/{{testPetId}}"
+        name: Edit Pet
+        meta:
+          id: req_62c31237ed42438987ff761f8d5243c0
+          created: 1753540716727
+          modified: 1755721428791
+          isPrivate: false
+          description: ""
+          sortKey: -1753540716727
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {   
+            	"petName": "Sharik",
+            	"petType": "dog" 
+            }
+        headers:
+          - name: accept
+            value: "*/*"
+            id: pair_eab0dd0defc140a085bdfef0b0abc5a1
+          - name: Content-Type
+            value: application/json
+            id: pair_3ffe127419354ae2aafdfd498fec8571
+          - id: pair_1bfb9ff205f7415faf2590b7b397501e
+            name: Authorization
+            value: Bearer {{accessToken}}
+            description: ""
+            disabled: false
+        scripts:
+          preRequest: ""
+          afterResponse: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{apiUrl}}/Pets/{{testPetId}}"
+        name: Delete Pet
+        meta:
+          id: req_34770196121f424087620460e8e3a57f
+          created: 1753540740763
+          modified: 1754597797505
+          isPrivate: false
+          description: ""
+          sortKey: -1753540740763
+        method: DELETE
+        headers:
+          - name: accept
+            value: "*/*"
+            id: pair_5185ef146ebd40aa9dc9398ddb20184b
+          - id: pair_320ae17dbd9c4497a0c1c456cab42661
+            name: Authorization
+            value: Bearer {{accessToken}}
+            description: ""
+            disabled: false
+        scripts:
+          preRequest: ""
+          afterResponse: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+    scripts:
+      afterResponse: ""
+      preRequest: ""
+  - name: Pet Photos
+    meta:
+      id: fld_e7a18a8840f040938833d17414fa94b1
+      created: 1753540985761
+      modified: 1753540985761
+      sortKey: -1753540985761
+      description: ""
+    children:
+      - url: "{{apiUrl}}/PetPhotos/upload"
+        name: Upload Pet Photo
+        meta:
+          id: req_197c2dbaa1bf4b6aa8916f5f2d85f0de
+          created: 1753540990799
+          modified: 1755720511229
+          isPrivate: false
+          description: ""
+          sortKey: -1753540990799
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: file
+              value: ""
+              description: ""
+              disabled: false
+              id: pair_4b50405a55ae448da8571b0826215740
+              type: file
+              fileName: C:\Users\Вадим\Downloads\cute-and-happy-dog-png-234795755.png
+            - id: pair_c179070664314ba6be6237cc1f6eb328
+              name: petId
+              value: "1"
+              description: ""
+              disabled: false
+        parameters:
+          - id: pair_7c40e1788cf94730918de1c6c258e70e
+            name: ""
+            value: ""
+            description: ""
+            disabled: false
+        headers:
+          - name: accept
+            value: "*/*"
+            id: pair_802e6a48bde641319c654131c067999c
+          - name: Content-Type
+            value: multipart/form-data
+            id: pair_4ce8fd8256d64b2f8c7c5fce0cd6c010
+          - id: pair_6af200ef81f74bde820ec4a3190dac38
+            name: Authorization
+            value: Bearer {{accessToken}}
+            description: ""
+            disabled: false
+        scripts:
+          preRequest: ""
+          afterResponse: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{apiUrl}}/PetPhotos/{{testPhotoId}}"
+        name: Get Pet Photo
+        meta:
+          id: req_cf3d2c6a280b4ea3b17093517c54ae92
+          created: 1753541079278
+          modified: 1754597925290
+          isPrivate: false
+          description: ""
+          sortKey: -1753541079278
+        method: GET
+        headers:
+          - name: accept
+            value: "*/*"
+            id: pair_efaf8e71580a442c878aa70cd63c346f
+          - id: pair_b26ceec5ea0a43d5abe8a4c89838da82
+            name: Authorization
+            value: Bearer {{accessToken}}
+            description: ""
+            disabled: false
+        scripts:
+          preRequest: ""
+          afterResponse: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{apiUrl}}/PetPhotos/by-pet/{{testPetId}}"
+        name: Get All Pet Photos
+        meta:
+          id: req_294bfe4f9e264709b9ff1e647c33cc93
+          created: 1753541100133
+          modified: 1754598067540
+          isPrivate: false
+          description: ""
+          sortKey: -1753541100133
+        method: GET
+        headers:
+          - name: accept
+            value: "*/*"
+            id: pair_3faeaa47f193473bb48dab3f4b9c649a
+          - id: pair_b3a859d1d1e44dbca2afb71ddfa9dca1
+            name: Authorization
+            value: Bearer {{accessToken}}
+            description: ""
+            disabled: false
+        scripts:
+          preRequest: ""
+          afterResponse: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{apiUrl}}/PetPhotos/{{testPhotoId}}"
+        name: Delete Pet Photo
+        meta:
+          id: req_d2e9ca0c45264e868ab7b58ac0484bf9
+          created: 1753541121026
+          modified: 1754597969036
+          isPrivate: false
+          description: ""
+          sortKey: -1753541121026
+        method: DELETE
+        headers:
+          - name: accept
+            value: "*/*"
+            id: pair_b6359067b7ba4bbfb3dddbf9e90e52d4
+          - id: pair_a6184000c53d4a91bf6741e044576d40
+            name: Authorization
+            value: Bearer {{accessToken}}
+            description: ""
+            disabled: false
+        scripts:
+          preRequest: ""
+          afterResponse: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+    scripts:
+      afterResponse: ""
+      preRequest: ""
+  - name: Auth
+    meta:
+      id: fld_b887e45f7c7d4b12a8f994d9d787aed9
+      created: 1754588395152
+      modified: 1754588420281
+      sortKey: -1754588395152
+      description: ""
+    children:
+      - url: "{{authUrl}}/register"
+        name: Register
+        meta:
+          id: req_76a5c8d1da5c47ca887110b447ce570f
+          created: 1754588455859
+          modified: 1754594413067
+          isPrivate: false
+          description: ""
+          sortKey: -1754588455859
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "userName": "{{testUser}}",
+              "password": "{{testPassword}}"
+            }
+        headers:
+          - name: accept
+            value: text/plain
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{authUrl}}/revoke"
+        name: Revoke
+        meta:
+          id: req_8bdb2aeafbda4dc89ab8637117b4843b
+          created: 1754588704854
+          modified: 1755721473401
+          isPrivate: false
+          description: ""
+          sortKey: -1754588704854
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "refreshToken": "{{refreshToken}}"
+            }
+        headers:
+          - name: accept
+            value: "*/*"
+            id: pair_4850e398c55f45f7b42f8b21949dabad
+          - name: Content-Type
+            value: application/json
+            id: pair_6d09a6bf96834c268d28e89fd08a9948
+          - id: pair_e41fe377385b445396565d53a529b735
+            name: Authorization
+            value: Bearer {{accessToken}}
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: ""
+          disabled: true
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{authUrl}}/refresh"
+        name: Refresh
+        meta:
+          id: req_e947df677fb54c96814f4b84d7e3cc30
+          created: 1754593302809
+          modified: 1755714892990
+          isPrivate: false
+          description: ""
+          sortKey: -1754593302809
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "accessToken": "{{accessToken}}",
+              "refreshToken": "{{refreshToken}}"
+            }
+        headers:
+          - name: accept
+            value: text/plain
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{host}}/api/Auth/revoke-all"
+        name: Revoke-all
+        meta:
+          id: req_2ceeaa1f56e647d8bbc39d26af823b6e
+          created: 1754593572592
+          modified: 1754595316733
+          isPrivate: false
+          description: ""
+          sortKey: -1754593572592
+        method: POST
+        body:
+          mimeType: ""
+          text: ""
+        headers:
+          - name: accept
+            value: "*/*"
+            id: pair_68fa7f08eaf44800a95f37c4e546842b
+          - id: pair_55c1fed72db040ba8abdafce84f0ccfe
+            name: Authorization
+            value: Bearer {{accessToken}}
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: ""
+          disabled: true
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{authUrl}}/login"
+        name: Login
+        meta:
+          id: req_7356224a36cc41bc9c28ce34cd92e21d
+          created: 1754594432321
+          modified: 1755715333383
+          isPrivate: false
+          description: ""
+          sortKey: -1754594432321
+        method: POST
+        body:
+          mimeType: application/json
+          text: |
+            {
+              "userName": "{{testUser}}",
+              "password": "{{testPassword}}"
+            }
+        headers:
+          - name: accept
+            value: text/plain
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_1419e01a455346d1b78d2a4f6de4bcc6
+    created: 1753539559640
+    modified: 1753539559640
+environments:
+  name: Base Environment
+  meta:
+    id: env_bb7d57bdc3224b5aa7721b542bd3f3fb
+    created: 1753539559638
+    modified: 1755715848665
+    isPrivate: false
+  data:
+    host: http://localhost:8080
+    apiUrl: "{{host}}/api"
+    authUrl: "{{apiUrl}}/Auth"
+    accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoicmVkb3R2IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiIxIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiUGV0T3duZXIiLCJqdGkiOiI3NjgwNmIxNi01ZjU3LTRmMmMtYjY5NS0yNmU4NjNiNzE0MWMiLCJleHAiOjE3NTYzMTk2NzQsImlzcyI6IlBldHNncmFtQXBpIiwiYXVkIjoiUGV0c2dyYW1BcGlDbGllbnQifQ.dXCX5xo-uvysZMg07X7tWBMs6i6hfBkCtL9DBdqudsk
+    refreshToken: VKPPRJbUe1bB56heivBf25q6p/zFGV+4/4JOTx1OJm5HhpuLACyorheh/+hYLuPGSccwwXFpRKCZd/7r+0SY/A==
+    testUser: user3
+    testPassword: your_password
+    currentUserId: "1"
+    testPetId: "1"
+    testPetTypeId: "1"
+    testPhotoId: "1"
+  subEnvironments:
+    - name: Dev
+      meta:
+        id: env_e039b17451ac403194a65a9d0f5224e0
+        created: 1755715833584
+        modified: 1755722454387
+        isPrivate: false
+        sortKey: 1755715833584
+      data:
+        host: http://localhost:8080
+        apiUrl: "{{host}}/api"
+        authUrl: "{{apiUrl}}/Auth"
+        accessToken: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoicmVkb3R2IiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiUGV0T3duZXIiLCJqdGkiOiI1NWY0Yjc3Zi00OTEyLTQ5YzktOGI3ZS0yYjEwODJlOTUwNTIiLCJuYmYiOjE3NTU3MjI0MDIsImV4cCI6MTc1NjMyNzIwMiwiaXNzIjoiUGV0c2dyYW1BcGkiLCJhdWQiOiJQZXRzZ3JhbUFwaUNsaWVudCJ9.ZTVB4q43nPqDTsKx6TH7DxUy5DGCytRxZjXm8qqEoOI
+        refreshToken: 44zPvBSmOpfU7lE2HN/I1ky4beiE+56QQlIZvEwePPyxBzOO70+21EvnwQxi+xIU63kKrif4KLFZQi1pSC80Fg==
+        testUser: user3
+        testPassword: your_password
+        currentUserId: "1"
+        testPetId: "1"
+        testPetTypeId: "2"
+        testPhotoId: "1"

@@ -1,28 +1,26 @@
-using Petsgram.Application;
-using Petsgram.Infrastructure;
+using Petsgram.Infrastructure.Extensions;
+using Petsgram.WebAPI.Extensions.ServiceCollectionExtensions;
+using Petsgram.WebAPI.Extensions.WebApplicationExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services
+    .AddApplicationLayer()
+    .AddInfrastructureLayer(builder.Configuration)
+    .AddAppSettings(builder.Configuration)
+    .AddRedisCaching(builder.Configuration)
+    .AddJwtAuthentication(builder.Configuration)
+    .AddAuthorization()
+    .AddWebApi();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
+app.UseGlobalExceptionHandling()
+    .UseSwaggerWithUi()
+    .UseHttpsRedirection()
+    .UseAuthentication()
+    .UseAuthorization()
+    .UseStaticPhotoFiles();
 
 app.MapControllers();
 
