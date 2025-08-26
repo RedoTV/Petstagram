@@ -25,7 +25,8 @@ public class PetService : IPetService
         IUnitOfWork unitOfWork,
         ICurrentUserService currentUserService,
         IMapper mapper,
-        ILogger<PetService> logger)
+        ILogger<PetService> logger,
+        IExchangeRateService exchangeRateService)
     {
         _petRepository = petRepository;
         _petTypeRepository = petTypeRepository;

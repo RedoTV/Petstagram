@@ -4,6 +4,9 @@ public class Pet
 {
     public int Id { get; set; }
     public required string PetName { get; set; }
+    public decimal Price { get; set; }
+    public string Currency { get; set; } = "USD";
+    
     public List<PetPhoto> Photos { get; set; } = [];
 
     public int PetTypeId { get; set; }

@@ -100,7 +100,7 @@ public class PetPhotoService : IPetPhotoService
 
         var filePath = Path.Combine(storagePath, uniqueName);
 
-        using (var stream = new FileStream(filePath, FileMode.Create))
+        await using (var stream = new FileStream(filePath, FileMode.Create))
         {
             await request.File.CopyToAsync(stream, cancellationToken);
         }

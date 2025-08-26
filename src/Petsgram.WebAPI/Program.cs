@@ -1,3 +1,4 @@
+using Petsgram.Infrastructure.Extensions;
 using Petsgram.WebAPI.Extensions.ServiceCollectionExtensions;
 using Petsgram.WebAPI.Extensions.WebApplicationExtensions;
 
@@ -7,6 +8,7 @@ builder.Services
     .AddApplicationLayer()
     .AddInfrastructureLayer(builder.Configuration)
     .AddAppSettings(builder.Configuration)
+    .AddRedisCaching(builder.Configuration)
     .AddJwtAuthentication(builder.Configuration)
     .AddAuthorization()
     .AddWebApi();
