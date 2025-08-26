@@ -6,14 +6,14 @@ var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__Db
 var optionsBuilder = new DbContextOptionsBuilder<PetsgramDbContext>();
 optionsBuilder.UseSqlServer(connectionString);
 
-using var context = new PetsgramDbContext(optionsBuilder.Options);
+await using var context = new PetsgramDbContext(optionsBuilder.Options);
 
 try
 {
     Console.WriteLine("Checking database connection...");
     await context.Database.CanConnectAsync();
     Console.WriteLine("Database connection successful");
-
+    
     Console.WriteLine("Applying database migrations...");
     await context.Database.MigrateAsync();
     Console.WriteLine("Migration complete");

@@ -18,23 +18,31 @@ public class PetsController : ControllerBase
     }
 
     [HttpGet("my-pets")]
-    public async Task<IActionResult> GetCurrentUserPets(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetCurrentUserPets(
+        [FromQuery] string? currency = null,
+        CancellationToken cancellationToken = default)
     {
-        var pets = await _petService.GetCurrentUserPetsAsync(cancellationToken);
+        var pets = await _petService.GetCurrentUserPetsAsync(currency, cancellationToken);
         return Ok(pets);
     }
 
     [HttpGet("user/{userId}")]
-    public async Task<IActionResult> GetAllByUser(int userId, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAllByUser(
+        int userId, 
+        [FromQuery] string? currency = null,
+        CancellationToken cancellationToken = default)
     {
-        var pets = await _petService.GetUserPetsAsync(userId, cancellationToken);
+        var pets = await _petService.GetUserPetsAsync(userId, currency, cancellationToken);
         return Ok(pets);
     }
 
     [HttpGet("{petId}")]
-    public async Task<IActionResult> GetById(int petId, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetById(
+        int petId, 
+        [FromQuery] string? currency = null,
+        CancellationToken cancellationToken = default)
     {
-        var pet = await _petService.GetPetByIdAsync(petId, cancellationToken);
+        var pet = await _petService.GetPetByIdAsync(petId, currency, cancellationToken);
         return Ok(pet);
     }
 

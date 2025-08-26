@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Petsgram.Application.Interfaces.Auth;
 using Petsgram.Application.Interfaces.Caching;
+using Petsgram.Application.Interfaces.ExchangeRate;
 using Petsgram.Application.Interfaces.PetPhotos;
 using Petsgram.Application.Interfaces.Pets;
 using Petsgram.Application.Interfaces.PetTypes;
@@ -11,6 +12,7 @@ using Petsgram.Application.Interfaces.Users;
 using Petsgram.Application.Settings;
 using Petsgram.Infrastructure.Repositories;
 using Petsgram.Infrastructure.Services.Auth;
+using Petsgram.Infrastructure.Services.ExchangeRate;
 using Petsgram.Infrastructure.Services.RedisCache;
 using Petsgram.Infrastructure.UnitOfWork;
 
@@ -31,11 +33,17 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<IExchangeRateService, ExchangeRateApiService>();
+        
+        services.AddHttpClient<IExchangeRateService, ExchangeRateApiService>(client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(10);
+        });
         
         services.AddSingleton<ICacheService>(sp =>
         {
             var opt = sp.GetRequiredService<IOptions<RedisSettings>>().Value;
-            var defaultExpiration = TimeSpan.FromSeconds(opt.DefaultTtlSeconds);
+            var defaultExpiration = TimeSpan.FromSeconds(opt.DefaultExpiration);
             return new RedisCacheService(
                 sp.GetRequiredService<IDistributedCache>(),
                 defaultExpiration

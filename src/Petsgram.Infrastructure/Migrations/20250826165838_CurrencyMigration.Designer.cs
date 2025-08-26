@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Petsgram.Infrastructure.DbContexts;
 
@@ -11,9 +12,11 @@ using Petsgram.Infrastructure.DbContexts;
 namespace Petsgram.WebAPI.Migrations
 {
     [DbContext(typeof(PetsgramDbContext))]
-    partial class PetsgramDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250826165838_CurrencyMigration")]
+    partial class CurrencyMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,8 +45,7 @@ namespace Petsgram.WebAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");

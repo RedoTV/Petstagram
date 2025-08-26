@@ -9,6 +9,10 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
     public void Configure(EntityTypeBuilder<Pet> builder)
     {
         builder.HasKey(p => p.Id);
+        
+        builder.Property(p => p.Price)
+            .HasPrecision(18, 4);
+        
         builder.HasOne(p => p.User)
             .WithMany(u => u.Pets)
             .HasForeignKey(p => p.UserId)

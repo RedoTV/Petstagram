@@ -9,8 +9,7 @@ public static partial class ServiceCollectionExtensions
     {
         services
             .AddApplicationServices()
-            .AddAutoMapper()
-            .AddStorageSettings();
+            .AddAutoMapper();
         
         return services;
     }
